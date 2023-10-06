@@ -2,27 +2,101 @@
 #
 # https://gqlgen.com/getting-started/
 
-type Todo {
+# User and store will be added later
+# type User {
+#   id: ID!
+#   username: String!
+#   password: String!
+# }
+
+# type Store {
+#   id: ID!
+#   name: String!
+# }
+
+type Item {
   id: ID!
-  text: String!
-  done: Boolean!
-  user: User!
+  name: String!
+  price: Float!
+  qty: Int!
+  promotion: Boolean
+  promotionPrice: Float
+  replenish: Boolean
+  totalSalesWeekItem: Float
+  aisleId: String! # FK (Foreign Key)
+  departmentId: String! # FK
 }
 
-type User {
+type Department {
   id: ID!
+  name: String!
+  totalSalesWeekDept: Float
+}
+
+type Aisle {
+  id: ID!
+  departmentId: String! # FK
+}
+
+# Later, I might implement an Employee model,
+# and the manager model will be an extension of it.
+type Manager {
+  id: ID!
+  firstName: String!
+  lastName: String!
+  departmentId: String # FK
+}
+
+input NewItem {
+  name: String!
+  price: Float!
+  qty: Int!
+  aisleId: String! # FK
+  departmentId: String! # FK
+}
+
+input NewAisle {
+  departmentId: String! # FK
+}
+
+input NewDepartment {
   name: String!
 }
 
-type Query {
-  todos: [Todo!]!
+input NewManager {
+  firstName: String!
+  lastName: String!
+  departmentId: String # FK
 }
 
-input NewTodo {
-  text: String!
-  userId: String!
+type Query {
+  getAllItems: [Item]
+  getItemById: Item
+  getAllDepartments: [Department]
+  getDepartmentById: Department
+  getAllAisles: [Aisle]
+  getAisleById: Aisle
+  getAllManagers: [Manager]
+  getManagerById: Manager
+  getTopItems: [Item]
+  getTopDepartments: [Department]
 }
 
 type Mutation {
-  createTodo(input: NewTodo!): Todo!
+  addItem(input: NewItem): Item
+  updateItem: Item
+  deleteItem: Item
+  sellItem: Item
+  returnItem: Item
+  orderItems: [Item]
+  setSaleItem: Item
+  addDepartment(input: NewDepartment): Department
+  updateDepartment: Department
+  deleteDepartment: Department
+  addAisle(input: NewAisle): Aisle
+  updateAisle: Aisle
+  deleteAisle: Aisle
+  addManager(input: NewManager): Manager
+  updateManager: Manager
+  deleteManager: Manager
 }
