@@ -2,19 +2,57 @@
 
 package model
 
-type NewTodo struct {
-	Text   string `json:"text"`
-	UserID string `json:"userId"`
+type Aisle struct {
+	ID           int    `json:"id"`
+	DepartmentID string `json:"departmentId"`
 }
 
-type Todo struct {
-	ID   string `json:"id"`
-	Text string `json:"text"`
-	Done bool   `json:"done"`
-	User *User  `json:"user"`
+type Department struct {
+	ID                 int      `json:"id"`
+	Name               string   `json:"name"`
+	TotalSalesWeekDept *float64 `json:"totalSalesWeekDept,omitempty"`
 }
 
-type User struct {
-	ID   string `json:"id"`
+type Item struct {
+	ID                 int      `json:"id"`
+	Name               string   `json:"name"`
+	Price              float64  `json:"price"`
+	Qty                int      `json:"qty"`
+	Category           string   `json:"category"`
+	Promotion          *bool    `json:"promotion,omitempty"`
+	PromotionPrice     *float64 `json:"promotionPrice,omitempty"`
+	Replenish          *bool    `json:"replenish,omitempty"`
+	TotalSalesWeekItem *float64 `json:"totalSalesWeekItem,omitempty"`
+	AisleID            string   `json:"aisleId"`
+	DepartmentID       string   `json:"departmentId"`
+}
+
+type Manager struct {
+	ID           int     `json:"id"`
+	FirstName    string  `json:"firstName"`
+	LastName     string  `json:"lastName"`
+	DepartmentID *string `json:"departmentId,omitempty"`
+}
+
+type NewAisle struct {
+	DepartmentID string `json:"departmentId"`
+}
+
+type NewDepartment struct {
 	Name string `json:"name"`
+}
+
+type NewItem struct {
+	Name         string  `json:"name"`
+	Price        float64 `json:"price"`
+	Qty          int     `json:"qty"`
+	Category     string  `json:"category"`
+	AisleID      string  `json:"aisleId"`
+	DepartmentID string  `json:"departmentId"`
+}
+
+type NewManager struct {
+	FirstName    string  `json:"firstName"`
+	LastName     string  `json:"lastName"`
+	DepartmentID *string `json:"departmentId,omitempty"`
 }

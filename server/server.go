@@ -18,23 +18,16 @@ type Config struct {
 
 type Application struct {
 	Config Config
-	// TO DO: add models
 }
 
 func (app *Application) Serve() error {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file.")
-	}
-	port := os.Getenv("PORT")
-
 	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{}}))
 
 	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
 	http.Handle("/query", srv)
 
-	log.Printf("Connect to http://localhost:%s/ for GraphQL playground", port)
-	return http.ListenAndServe(":"+port, nil)
+	log.Printf("Connect to http://localhost:%s/ for GraphQL playground", app.Config.Port)
+	return http.ListenAndServe(":"+app.Config.Port, nil)
 }
 
 func main() {
@@ -53,7 +46,7 @@ func main() {
 		log.Fatal("Cannot connect to database")
 	}
 
-	defer dbConn.DB.Close()
+	defer dbConn.Close()
 
 	app := &Application {
 		Config: cfg,

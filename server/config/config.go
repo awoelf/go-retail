@@ -9,13 +9,9 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-type DB struct {
-	DB *sql.DB
-}
+var DB *sql.DB
 
-var dbConn = &DB{}
-
-func Connect(dsn string) (*DB, error) {
+func Connect(dsn string) (*sql.DB, error) {
 	if err := godotenv.Load(); err != nil {
 		log.Println("No .env file found")
 	}
@@ -31,8 +27,8 @@ func Connect(dsn string) (*DB, error) {
 		return nil, err
 	}
 
-	dbConn.DB = db
-	return dbConn, nil
+	DB = db
+	return DB, nil
 }
 
 func testDB(db *sql.DB) error {

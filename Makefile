@@ -22,10 +22,14 @@ stop_containers:
 	fi
 
 create_container:
-	docker run --name ${DB_DOCKER_CONTAINER} -v ${PWD}/mysql/init.sql:/docker-entrypoint-initdb.d/0_init.sql -e MYSQL_ROOT_PASSWORD=${MYSQL_PASSWORD} -d -p 3306:3306 mysql:8.1.0
+	docker run --name ${DB_DOCKER_CONTAINER} -v ${PWD}/mysql/init.sql:/docker-entrypoint-initdb.d/0_init.sql -e MYSQL_ROOT_PASSWORD=${MYSQL_PASSWORD} -p 3306:3306 -d mysql:8.1.0
 
 run_container:
 	docker start ${DB_DOCKER_CONTAINER}
+
+delete_container: stop_containers
+	@echo "Deleting ${DB_DOCKER_CONTAINER}"; \
+	docker rm ${DB_DOCKER_CONTAINER}; \
 
 mysql:
 	docker run -it mysql bash -c 'mysql -h ${HOST} -u ${MYSQL_USER} -p"${MYSQL_PASSWORD}"'

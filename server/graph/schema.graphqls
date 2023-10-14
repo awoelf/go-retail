@@ -3,22 +3,13 @@
 # https://gqlgen.com/getting-started/
 
 # User and store will be added later
-# type User {
-#   id: ID!
-#   username: String!
-#   password: String!
-# }
-
-# type Store {
-#   id: ID!
-#   name: String!
-# }
 
 type Item {
-  id: ID!
+  id: Int!
   name: String!
   price: Float!
   qty: Int!
+  category: String!
   promotion: Boolean
   promotionPrice: Float
   replenish: Boolean
@@ -28,20 +19,20 @@ type Item {
 }
 
 type Department {
-  id: ID!
+  id: Int!
   name: String!
   totalSalesWeekDept: Float
 }
 
 type Aisle {
-  id: ID!
+  id: Int!
   departmentId: String! # FK
 }
 
 # Later, I might implement an Employee model,
 # and the manager model will be an extension of it.
 type Manager {
-  id: ID!
+  id: Int!
   firstName: String!
   lastName: String!
   departmentId: String # FK
@@ -51,6 +42,7 @@ input NewItem {
   name: String!
   price: Float!
   qty: Int!
+  category: String!
   aisleId: String! # FK
   departmentId: String! # FK
 }
