@@ -57,17 +57,16 @@ input NewItem {
 
 input UpdateItem {
 	id: Int!
-	name: String
-	price: Float
-	qty: Int
-	category: String
-	promotion: Boolean
-	promotionPrice: Float
-	replenish: Boolean
-	totalSalesWeekItem: Float
-	aisleId: String
-	departmentId: String
-	updatedAt: String
+	name: String!
+	price: Float!
+	qty: Int!
+	category: String!
+	promotion: Boolean!
+	promotionPrice: Float!
+	replenish: Boolean!
+	totalSalesWeekItem: Float!
+	aisleId: String!
+	departmentId: String!
 }
 
 input NewAisle {
@@ -76,8 +75,7 @@ input NewAisle {
 
 input UpdateAisle {
 	id: Int!
-	departmentId: String
-	updatedAt: String
+	departmentId: String!
 }
 
 input NewDepartment {
@@ -86,23 +84,21 @@ input NewDepartment {
 
 input UpdateDepartment {
 	id: Int!
-	name: String
-	totalSalesWeekDept: Float
-	updatedAt: String
+	name: String!
+	totalSalesWeekDept: Float!
 }
 
 input NewManager {
 	firstName: String!
 	lastName: String!
-	departmentId: String # FK
+	departmentId: String
 }
 
 input UpdateManager {
 	id: Int!
-	firstName: String
-	lastName: String
-	departmentId: String
-	updatedAt: String
+	firstName: String!
+	lastName: String!
+	departmentId: String!
 }
 
 type Query {
@@ -122,18 +118,18 @@ type Query {
 type Mutation {
 	addItem(input: NewItem): Item
 	updateItem(input: UpdateItem): Item
-	deleteItem: Item
+	deleteItem(id: Int): Int
 	sellItem: Item
 	returnItem: Item
 	orderItems: [Item]
 	setSaleItem: Item
 	addDepartment(input: NewDepartment): Department
 	updateDepartment(input: UpdateDepartment): Department
-	deleteDepartment: Department
+	deleteDepartment(id: Int): Int
 	addAisle(input: NewAisle): Aisle
 	updateAisle(input: UpdateAisle): Aisle
-	deleteAisle: Aisle
+	deleteAisle(id: Int): Int
 	addManager(input: NewManager): Manager
 	updateManager(input: UpdateManager): Manager
-	deleteManager: Manager
+	deleteManager(id: Int): Int
 }

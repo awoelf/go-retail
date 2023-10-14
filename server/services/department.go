@@ -77,3 +77,36 @@ func (d *Department) GetDepartmentById(id int64) (*model.Department, error) {
 	return &department, nil
 }
 
+func (d *Department) UpdateDepartment(input *model.UpdateDepartment) (int64, error) {
+	stmt, err := config.DB.Prepare("UPDATE Departments SET Name = ?, TotalSalesWeekDept = ?, UpdatedAt = NOW() WHERE ID = ?")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	res, err := stmt.Exec(input.Name, input.TotalSalesWeekDept, input.ID)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	id, err := res.LastInsertId()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return id, nil
+}
+
+func (d *Department) DeleteDepartment(id int64) (error) {
+	stmt, err := config.DB.Prepare("DELETE FROM Departments WHERE ID = ?")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	_, err = stmt.Exec(id)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+
+	return nil
+}

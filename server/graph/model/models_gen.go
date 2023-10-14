@@ -66,37 +66,33 @@ type NewManager struct {
 }
 
 type UpdateAisle struct {
-	ID           int     `json:"id"`
-	DepartmentID *string `json:"departmentId,omitempty"`
-	UpdatedAt    *string `json:"updatedAt,omitempty"`
+	ID           int    `json:"id"`
+	DepartmentID string `json:"departmentId"`
 }
 
 type UpdateDepartment struct {
-	ID                 int      `json:"id"`
-	Name               *string  `json:"name,omitempty"`
-	TotalSalesWeekDept *float64 `json:"totalSalesWeekDept,omitempty"`
-	UpdatedAt          *string  `json:"updatedAt,omitempty"`
+	ID                 int     `json:"id"`
+	Name               string  `json:"name"`
+	TotalSalesWeekDept float64 `json:"totalSalesWeekDept"`
 }
 
 type UpdateItem struct {
-	ID                 int      `json:"id"`
-	Name               *string  `json:"name,omitempty"`
-	Price              *float64 `json:"price,omitempty"`
-	Qty                *int     `json:"qty,omitempty"`
-	Category           *string  `json:"category,omitempty"`
-	Promotion          *bool    `json:"promotion,omitempty"`
-	PromotionPrice     *float64 `json:"promotionPrice,omitempty"`
-	Replenish          *bool    `json:"replenish,omitempty"`
-	TotalSalesWeekItem *float64 `json:"totalSalesWeekItem,omitempty"`
-	AisleID            *string  `json:"aisleId,omitempty"`
-	DepartmentID       *string  `json:"departmentId,omitempty"`
-	UpdatedAt          *string  `json:"updatedAt,omitempty"`
+	ID                 int     `json:"id"`
+	Name               string  `json:"name"`
+	Price              float64 `json:"price"`
+	Qty                int     `json:"qty"`
+	Category           string  `json:"category"`
+	Promotion          bool    `json:"promotion"`
+	PromotionPrice     float64 `json:"promotionPrice"`
+	Replenish          bool    `json:"replenish"`
+	TotalSalesWeekItem float64 `json:"totalSalesWeekItem"`
+	AisleID            string  `json:"aisleId"`
+	DepartmentID       string  `json:"departmentId"`
 }
 
 type UpdateManager struct {
-	ID           int     `json:"id"`
-	FirstName    *string `json:"firstName,omitempty"`
-	LastName     *string `json:"lastName,omitempty"`
-	DepartmentID *string `json:"departmentId,omitempty"`
-	UpdatedAt    *string `json:"updatedAt,omitempty"`
+	ID           int    `json:"id"`
+	FirstName    string `json:"firstName"`
+	LastName     string `json:"lastName"`
+	DepartmentID string `json:"departmentId"`
 }

@@ -24,7 +24,7 @@ func (r *mutationResolver) UpdateItem(ctx context.Context, input *model.UpdateIt
 }
 
 // DeleteItem is the resolver for the deleteItem field.
-func (r *mutationResolver) DeleteItem(ctx context.Context) (*model.Item, error) {
+func (r *mutationResolver) DeleteItem(ctx context.Context, id *int) (*int, error) {
 	panic(fmt.Errorf("not implemented: DeleteItem - deleteItem"))
 }
 
@@ -51,23 +51,35 @@ func (r *mutationResolver) SetSaleItem(ctx context.Context) (*model.Item, error)
 // AddDepartment is the resolver for the addDepartment field.
 func (r *mutationResolver) AddDepartment(ctx context.Context, input *model.NewDepartment) (*model.Department, error) {
 	var Department services.Department
-	deptId, err := Department.AddDepartment(input)
+	id, err := Department.AddDepartment(input)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	fmt.Printf("res: %v\n", deptId)
-	return &model.Department{ID: int(deptId), Name: input.Name}, nil
+	fmt.Printf("res: %v\n", id)
+	return &model.Department{ID: int(id), Name: input.Name}, nil
 }
 
 // UpdateDepartment is the resolver for the updateDepartment field.
 func (r *mutationResolver) UpdateDepartment(ctx context.Context, input *model.UpdateDepartment) (*model.Department, error) {
-	panic(fmt.Errorf("not implemented: UpdateDepartment - updateDepartment"))
+	var Department services.Department
+	id, err := Department.UpdateDepartment(input)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return &model.Department{ID: int(id), Name: input.Name, TotalSalesWeekDept: &input.TotalSalesWeekDept}, nil
 }
 
 // DeleteDepartment is the resolver for the deleteDepartment field.
-func (r *mutationResolver) DeleteDepartment(ctx context.Context) (*model.Department, error) {
-	panic(fmt.Errorf("not implemented: DeleteDepartment - deleteDepartment"))
+func (r *mutationResolver) DeleteDepartment(ctx context.Context, id *int) (*int, error) {
+	var Department services.Department
+	err := Department.DeleteDepartment(int64(*id))
+	if err != nil {
+		log.Fatal(err)
+	}
+	
+	return id, nil
 }
 
 // AddAisle is the resolver for the addAisle field.
@@ -81,7 +93,7 @@ func (r *mutationResolver) UpdateAisle(ctx context.Context, input *model.UpdateA
 }
 
 // DeleteAisle is the resolver for the deleteAisle field.
-func (r *mutationResolver) DeleteAisle(ctx context.Context) (*model.Aisle, error) {
+func (r *mutationResolver) DeleteAisle(ctx context.Context, id *int) (*int, error) {
 	panic(fmt.Errorf("not implemented: DeleteAisle - deleteAisle"))
 }
 
@@ -96,7 +108,7 @@ func (r *mutationResolver) UpdateManager(ctx context.Context, input *model.Updat
 }
 
 // DeleteManager is the resolver for the deleteManager field.
-func (r *mutationResolver) DeleteManager(ctx context.Context) (*model.Manager, error) {
+func (r *mutationResolver) DeleteManager(ctx context.Context, id *int) (*int, error) {
 	panic(fmt.Errorf("not implemented: DeleteManager - deleteManager"))
 }
 
