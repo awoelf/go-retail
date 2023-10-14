@@ -7,8 +7,10 @@ package graph
 import (
 	"context"
 	"fmt"
+	"log"
 
 	"github.com/awoelf/go-retail/server/graph/model"
+	"github.com/awoelf/go-retail/server/services"
 )
 
 // AddItem is the resolver for the addItem field.
@@ -17,7 +19,7 @@ func (r *mutationResolver) AddItem(ctx context.Context, input *model.NewItem) (*
 }
 
 // UpdateItem is the resolver for the updateItem field.
-func (r *mutationResolver) UpdateItem(ctx context.Context) (*model.Item, error) {
+func (r *mutationResolver) UpdateItem(ctx context.Context, input *model.UpdateItem) (*model.Item, error) {
 	panic(fmt.Errorf("not implemented: UpdateItem - updateItem"))
 }
 
@@ -48,11 +50,18 @@ func (r *mutationResolver) SetSaleItem(ctx context.Context) (*model.Item, error)
 
 // AddDepartment is the resolver for the addDepartment field.
 func (r *mutationResolver) AddDepartment(ctx context.Context, input *model.NewDepartment) (*model.Department, error) {
-	panic(fmt.Errorf("not implemented: AddDepartment - addDepartment"))
+	var Department services.Department
+	deptId, err := Department.AddDepartment(input)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Printf("res: %v\n", deptId)
+	return &model.Department{ID: int(deptId), Name: input.Name}, nil
 }
 
 // UpdateDepartment is the resolver for the updateDepartment field.
-func (r *mutationResolver) UpdateDepartment(ctx context.Context) (*model.Department, error) {
+func (r *mutationResolver) UpdateDepartment(ctx context.Context, input *model.UpdateDepartment) (*model.Department, error) {
 	panic(fmt.Errorf("not implemented: UpdateDepartment - updateDepartment"))
 }
 
@@ -67,7 +76,7 @@ func (r *mutationResolver) AddAisle(ctx context.Context, input *model.NewAisle) 
 }
 
 // UpdateAisle is the resolver for the updateAisle field.
-func (r *mutationResolver) UpdateAisle(ctx context.Context) (*model.Aisle, error) {
+func (r *mutationResolver) UpdateAisle(ctx context.Context, input *model.UpdateAisle) (*model.Aisle, error) {
 	panic(fmt.Errorf("not implemented: UpdateAisle - updateAisle"))
 }
 
@@ -82,7 +91,7 @@ func (r *mutationResolver) AddManager(ctx context.Context, input *model.NewManag
 }
 
 // UpdateManager is the resolver for the updateManager field.
-func (r *mutationResolver) UpdateManager(ctx context.Context) (*model.Manager, error) {
+func (r *mutationResolver) UpdateManager(ctx context.Context, input *model.UpdateManager) (*model.Manager, error) {
 	panic(fmt.Errorf("not implemented: UpdateManager - updateManager"))
 }
 
@@ -97,18 +106,50 @@ func (r *queryResolver) GetAllItems(ctx context.Context) ([]*model.Item, error) 
 }
 
 // GetItemByID is the resolver for the getItemById field.
-func (r *queryResolver) GetItemByID(ctx context.Context) (*model.Item, error) {
+func (r *queryResolver) GetItemByID(ctx context.Context, id *int) (*model.Item, error) {
 	panic(fmt.Errorf("not implemented: GetItemByID - getItemById"))
+}
+
+// GetTopItems is the resolver for the getTopItems field.
+func (r *queryResolver) GetTopItems(ctx context.Context) ([]*model.Item, error) {
+	panic(fmt.Errorf("not implemented: GetTopItems - getTopItems"))
+}
+
+// GetItemsByCategory is the resolver for the getItemsByCategory field.
+func (r *queryResolver) GetItemsByCategory(ctx context.Context, category *string) ([]*model.Item, error) {
+	panic(fmt.Errorf("not implemented: GetItemsByCategory - getItemsByCategory"))
 }
 
 // GetAllDepartments is the resolver for the getAllDepartments field.
 func (r *queryResolver) GetAllDepartments(ctx context.Context) ([]*model.Department, error) {
-	panic(fmt.Errorf("not implemented: GetAllDepartments - getAllDepartments"))
+	var Department services.Department
+	var resDepartments []*model.Department
+	dbDepartments, err := Department.GetAllDepartments()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for _, department := range dbDepartments {
+		resDepartments = append(resDepartments, &model.Department{ID: department.ID, Name: department.Name, TotalSalesWeekDept: department.TotalSalesWeekDept, CreatedAt: department.CreatedAt, UpdatedAt: department.UpdatedAt})
+	}
+
+	return resDepartments, nil
 }
 
 // GetDepartmentByID is the resolver for the getDepartmentById field.
-func (r *queryResolver) GetDepartmentByID(ctx context.Context) (*model.Department, error) {
-	panic(fmt.Errorf("not implemented: GetDepartmentByID - getDepartmentById"))
+func (r *queryResolver) GetDepartmentByID(ctx context.Context, id *int) (*model.Department, error) {
+	var Department services.Department
+	department, err := Department.GetDepartmentById(int64(*id))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return department, err
+}
+
+// GetTopDepartments is the resolver for the getTopDepartments field.
+func (r *queryResolver) GetTopDepartments(ctx context.Context) ([]*model.Department, error) {
+	panic(fmt.Errorf("not implemented: GetTopDepartments - getTopDepartments"))
 }
 
 // GetAllAisles is the resolver for the getAllAisles field.
@@ -117,7 +158,7 @@ func (r *queryResolver) GetAllAisles(ctx context.Context) ([]*model.Aisle, error
 }
 
 // GetAisleByID is the resolver for the getAisleById field.
-func (r *queryResolver) GetAisleByID(ctx context.Context) (*model.Aisle, error) {
+func (r *queryResolver) GetAisleByID(ctx context.Context, id *int) (*model.Aisle, error) {
 	panic(fmt.Errorf("not implemented: GetAisleByID - getAisleById"))
 }
 
@@ -127,18 +168,8 @@ func (r *queryResolver) GetAllManagers(ctx context.Context) ([]*model.Manager, e
 }
 
 // GetManagerByID is the resolver for the getManagerById field.
-func (r *queryResolver) GetManagerByID(ctx context.Context) (*model.Manager, error) {
+func (r *queryResolver) GetManagerByID(ctx context.Context, id *int) (*model.Manager, error) {
 	panic(fmt.Errorf("not implemented: GetManagerByID - getManagerById"))
-}
-
-// GetTopItems is the resolver for the getTopItems field.
-func (r *queryResolver) GetTopItems(ctx context.Context) ([]*model.Item, error) {
-	panic(fmt.Errorf("not implemented: GetTopItems - getTopItems"))
-}
-
-// GetTopDepartments is the resolver for the getTopDepartments field.
-func (r *queryResolver) GetTopDepartments(ctx context.Context) ([]*model.Department, error) {
-	panic(fmt.Errorf("not implemented: GetTopDepartments - getTopDepartments"))
 }
 
 // Mutation returns MutationResolver implementation.

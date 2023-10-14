@@ -5,90 +5,135 @@
 # User and store will be added later
 
 type Item {
-  id: Int!
-  name: String!
-  price: Float!
-  qty: Int!
-  category: String!
-  promotion: Boolean
-  promotionPrice: Float
-  replenish: Boolean
-  totalSalesWeekItem: Float
-  aisleId: String! # FK (Foreign Key)
-  departmentId: String! # FK
+	id: Int!
+	name: String!
+	price: Float!
+	qty: Int!
+	category: String!
+	promotion: Boolean
+	promotionPrice: Float
+	replenish: Boolean
+	totalSalesWeekItem: Float
+	aisleId: String! # FK (Foreign Key)
+	departmentId: String! # FK
+	createdAt: String
+	updatedAt: String
 }
 
 type Department {
-  id: Int!
-  name: String!
-  totalSalesWeekDept: Float
+	id: Int!
+	name: String!
+	totalSalesWeekDept: Float
+	createdAt: String
+	updatedAt: String
 }
 
 type Aisle {
-  id: Int!
-  departmentId: String! # FK
+	id: Int!
+	departmentId: String! # FK
+	createdAt: String
+	updatedAt: String
 }
 
 # Later, I might implement an Employee model,
 # and the manager model will be an extension of it.
 type Manager {
-  id: Int!
-  firstName: String!
-  lastName: String!
-  departmentId: String # FK
+	id: Int!
+	firstName: String!
+	lastName: String!
+	departmentId: String # FK
+	createdAt: String
+	updatedAt: String
 }
 
 input NewItem {
-  name: String!
-  price: Float!
-  qty: Int!
-  category: String!
-  aisleId: String! # FK
-  departmentId: String! # FK
+	name: String!
+	price: Float!
+	qty: Int!
+	category: String!
+	aisleId: String! # FK
+	departmentId: String! # FK
+}
+
+input UpdateItem {
+	id: Int!
+	name: String
+	price: Float
+	qty: Int
+	category: String
+	promotion: Boolean
+	promotionPrice: Float
+	replenish: Boolean
+	totalSalesWeekItem: Float
+	aisleId: String
+	departmentId: String
+	updatedAt: String
 }
 
 input NewAisle {
-  departmentId: String! # FK
+	departmentId: String! # FK
+}
+
+input UpdateAisle {
+	id: Int!
+	departmentId: String
+	updatedAt: String
 }
 
 input NewDepartment {
-  name: String!
+	name: String!
+}
+
+input UpdateDepartment {
+	id: Int!
+	name: String
+	totalSalesWeekDept: Float
+	updatedAt: String
 }
 
 input NewManager {
-  firstName: String!
-  lastName: String!
-  departmentId: String # FK
+	firstName: String!
+	lastName: String!
+	departmentId: String # FK
+}
+
+input UpdateManager {
+	id: Int!
+	firstName: String
+	lastName: String
+	departmentId: String
+	updatedAt: String
 }
 
 type Query {
-  getAllItems: [Item]
-  getItemById: Item
-  getAllDepartments: [Department]
-  getDepartmentById: Department
-  getAllAisles: [Aisle]
-  getAisleById: Aisle
-  getAllManagers: [Manager]
-  getManagerById: Manager
-  getTopItems: [Item]
-  getTopDepartments: [Department]
+	getAllItems: [Item]
+	getItemById(id: Int): Item
+	getTopItems: [Item]
+	getItemsByCategory(category: String): [Item]
+	getAllDepartments: [Department]
+	getDepartmentById(id: Int): Department
+	getTopDepartments: [Department]
+	getAllAisles: [Aisle]
+	getAisleById(id: Int): Aisle
+	getAllManagers: [Manager]
+	getManagerById(id: Int): Manager
 }
 
 type Mutation {
-  addItem(input: NewItem): Item
-  updateItem: Item
-  deleteItem: Item
-  sellItem: Item
-  returnItem: Item
-  orderItems: [Item]
-  setSaleItem: Item
-  addDepartment(input: NewDepartment): Department
-  updateDepartment: Department
-  deleteDepartment: Department
-  addAisle(input: NewAisle): Aisle
-  updateAisle: Aisle
-  deleteAisle: Aisle
-  addManager(input: NewManager): Manager
-  updateManager: Manager
-  deleteManager: Manager
+	addItem(input: NewItem): Item
+	updateItem(input: UpdateItem): Item
+	deleteItem: Item
+	sellItem: Item
+	returnItem: Item
+	orderItems: [Item]
+	setSaleItem: Item
+	addDepartment(input: NewDepartment): Department
+	updateDepartment(input: UpdateDepartment): Department
+	deleteDepartment: Department
+	addAisle(input: NewAisle): Aisle
+	updateAisle(input: UpdateAisle): Aisle
+	deleteAisle: Aisle
+	addManager(input: NewManager): Manager
+	updateManager(input: UpdateManager): Manager
+	deleteManager: Manager
 }

@@ -2,19 +2,20 @@ package services
 
 import (
 	"log"
+
 	"github.com/awoelf/go-retail/server/config"
 	"github.com/awoelf/go-retail/server/graph/model"
 )
 
-type Item struct {model.Item}
+type Item struct{ model.Item }
 
-func (item Item) Add() int64 {
-	stmt, err := config.DB.Prepare("INSERT INTO Items(Name, Price, Qty, AisleID, DepartmentID) VALUES(?,?,?,?,?)")
+func (item Item) AddItem() int64 {
+	stmt, err := config.DB.Prepare("INSERT INTO Items(Name, Price, Qty, Category, AisleID, DepartmentID) VALUES(?,?,?,?,?,?)")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	res, err := stmt.Exec(item.Name, item.Price, item.Qty, item.AisleID, item.DepartmentID)
+	res, err := stmt.Exec(item.Name, item.Price, item.Qty, item.Category, item.AisleID, item.DepartmentID)
 	if err != nil {
 		log.Fatal(err)
 	}
