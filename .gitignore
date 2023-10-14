@@ -22,6 +22,4 @@ go.work
 
 tools.go
 
-Makefile
-
 .env
