@@ -12,6 +12,12 @@ create_migrations:
 	cd server; \
 	sqlx migrate add -r init; \
 
+migrate_up:
+	sqlx migrate run --source ./server/migrations --database-url ${DB_URL}
+
+migrate_down:
+	sqlx migrate revert --source ./server/migrations --database-url ${DB_URL}
+
 stop_containers:
 	@echo "Stopping other docker containers"; \
 	if [ $$(docker ps -q) ]; then \

@@ -1,66 +1,23 @@
 -- Add up migration script here
-CREATE TABLE IF NOT EXISTS Departments(
-    ID VARCHAR(36) default (UUID()) UNIQUE,
-    Name VARCHAR (127) NOT NULL UNIQUE,
-    TotalSalesWeekDept FLOAT DEFAULT (0) NOT NULL,
-    
-	INDEX(ID),
-    
-    PRIMARY KEY (ID)
-);
+INSERT INTO Departments(Name)
+	VALUES
+		("Meat"),	 -- ID = 1
+		("Produce"), -- ID = 2
+		("Seafood"); -- ID = 3
 
-CREATE TABLE IF NOT EXISTS Managers(
-    ID VARCHAR(36) default (UUID()) UNIQUE,
-    FirstName VARCHAR (127) NOT NULL,
-    LastName VARCHAR (127) NOT NULL,
-    DepartmentID VARCHAR(36),
-    
-    INDEX (ID),
-    INDEX (DepartmentID),
-    
-    FOREIGN KEY (DepartmentID)
-    REFERENCES Departments(ID)
-    ON UPDATE CASCADE ON DELETE RESTRICT,
-    
-    PRIMARY KEY (ID)
-);
 
-CREATE TABLE IF NOT EXISTS Aisles(
-    ID VARCHAR(36) default (UUID()) UNIQUE,
-	DepartmentID VARCHAR(36) NOT NULL,
-    
-    INDEX (ID),
-    INDEX (DepartmentID),
-    
-    FOREIGN KEY (DepartmentID)
-    REFERENCES Departments(ID)
-    ON UPDATE CASCADE ON DELETE RESTRICT,
-    
-    PRIMARY KEY (ID)
-);
+INSERT INTO Managers(FirstName, LastName, DepartmentID)
+	VALUES
+		("Alexis", "Red", 1),
+		("John", "Blue", 2);
 
-CREATE TABLE IF NOT EXISTS Items(
-    ID VARCHAR(36) DEFAULT (UUID()) UNIQUE,
-    Name VARCHAR (127) NOT NULL UNIQUE,
-    Price FLOAT NOT NULL,
-    Qty INT NOT NULL,
-    Promotion BOOLEAN DEFAULT (FALSE) NOT NULL,
-    PromotionPrice FLOAT DEFAULT (0) NOT NULL,
-    Replenish BOOLEAN DEFAULT (FALSE) NOT NULL,
-    TotalSalesWeekItem FLOAT DEFAULT (0) NOT NULL,
-    AisleID VARCHAR(36) NOT NULL,
-    DepartmentID VARCHAR(36) NOT NULL,
-    
-    INDEX (ID),
-    INDEX (AisleID, DepartmentID),
-    
-    FOREIGN KEY (AisleID)
-    REFERENCES Aisles(ID)
-    ON UPDATE CASCADE ON DELETE RESTRICT,
-    
-    FOREIGN KEY (DepartmentID)
-    REFERENCES Departments(ID)
-    ON UPDATE CASCADE ON DELETE RESTRICT,
-    
-    PRIMARY KEY (ID)
-);
+INSERT INTO Aisles(DepartmentID)
+	VALUES
+		(1), -- ID = 1
+		(1), -- ID = 2
+		(2), -- ID = 3
+		(2); -- ID = 4
+
+INSERT INTO Items(Name, Price, Qty, Category, AisleID)
+	VALUES
+		("apple", 1.99, 500, "fruit", 2);

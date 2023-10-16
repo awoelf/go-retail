@@ -22,7 +22,7 @@ func (r *mutationResolver) AddItem(ctx context.Context, input *model.NewItem) (*
 	}
 
 	fmt.Printf("res: %v\n", id)
-	return &model.Item{ID: int(id), Name: input.Name, Price: input.Price, Qty: input.Qty, Category: input.Category, AisleID: input.AisleID, DepartmentID: input.DepartmentID}, nil
+	return &model.Item{ID: int(id), Name: input.Name, Price: input.Price, Qty: input.Qty, Category: input.Category, AisleID: input.AisleID}, nil
 }
 
 // UpdateItem is the resolver for the updateItem field.
@@ -33,7 +33,7 @@ func (r *mutationResolver) UpdateItem(ctx context.Context, input *model.UpdateIt
 		log.Fatal(err)
 	}
 
-	return &model.Item{ID: int(id), Name: input.Name, Price: input.Price, Qty: input.Qty, Category: input.Category, Promotion: &input.Promotion, PromotionPrice: &input.PromotionPrice, Replenish: &input.Replenish, TotalSalesWeekItem: &input.TotalSalesWeekItem, AisleID: input.AisleID, DepartmentID: input.DepartmentID}, nil
+	return &model.Item{ID: int(id), Name: input.Name, Price: input.Price, Qty: input.Qty, Category: input.Category, Promotion: &input.Promotion, PromotionPrice: &input.PromotionPrice, Replenish: &input.Replenish, TotalSalesWeekItem: &input.TotalSalesWeekItem, AisleID: input.AisleID}, nil
 }
 
 // DeleteItem is the resolver for the deleteItem field.
@@ -179,7 +179,7 @@ func (r *queryResolver) GetAllItems(ctx context.Context) ([]*model.Item, error) 
 	}
 
 	for _, item := range dbItems {
-		resItems = append(resItems, &model.Item{ID: item.ID, Name: item.Name, Price: item.Price, Qty: item.Qty, Category: item.Category, Promotion: item.Promotion, PromotionPrice: item.PromotionPrice, Replenish: item.Replenish, TotalSalesWeekItem: item.TotalSalesWeekItem, AisleID: item.AisleID, DepartmentID: item.DepartmentID})
+		resItems = append(resItems, &model.Item{ID: item.ID, Name: item.Name, Price: item.Price, Qty: item.Qty, Category: item.Category, Promotion: item.Promotion, PromotionPrice: item.PromotionPrice, Replenish: item.Replenish, TotalSalesWeekItem: item.TotalSalesWeekItem, AisleID: item.AisleID})
 	}
 
 	return resItems, nil
