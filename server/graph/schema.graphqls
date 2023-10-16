@@ -91,7 +91,7 @@ input UpdateDepartment {
 input NewManager {
 	firstName: String!
 	lastName: String!
-	departmentId: String
+	departmentId: String!
 }
 
 input UpdateManager {
