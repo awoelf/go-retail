@@ -13,6 +13,12 @@ GoRetail is a MySql back end written in Go to help users manage their retail sto
 
 ## Features
 - CRUD functionality for all models
+	- Department
+	- Manager
+	- Aisle
+	- Item
+- sqlx migrations
+- GraphQL playground
 
 ### Planned Features
 - User log in
