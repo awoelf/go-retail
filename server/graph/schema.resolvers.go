@@ -15,17 +15,36 @@ import (
 
 // AddItem is the resolver for the addItem field.
 func (r *mutationResolver) AddItem(ctx context.Context, input *model.NewItem) (*model.Item, error) {
-	panic(fmt.Errorf("not implemented: AddItem - addItem"))
+	var Item services.Item
+	id, err := Item.AddItem(input)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Printf("res: %v\n", id)
+	return &model.Item{ID: int(id), Name: input.Name, Price: input.Price, Qty: input.Qty, Category: input.Category, AisleID: input.AisleID, DepartmentID: input.DepartmentID}, nil
 }
 
 // UpdateItem is the resolver for the updateItem field.
 func (r *mutationResolver) UpdateItem(ctx context.Context, input *model.UpdateItem) (*model.Item, error) {
-	panic(fmt.Errorf("not implemented: UpdateItem - updateItem"))
+	var Item services.Item
+	id, err := Item.UpdateItem(input)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return &model.Item{ID: int(id), Name: input.Name, Price: input.Price, Qty: input.Qty, Category: input.Category, Promotion: &input.Promotion, PromotionPrice: &input.PromotionPrice, Replenish: &input.Replenish, TotalSalesWeekItem: &input.TotalSalesWeekItem, AisleID: input.AisleID, DepartmentID: input.DepartmentID}, nil
 }
 
 // DeleteItem is the resolver for the deleteItem field.
 func (r *mutationResolver) DeleteItem(ctx context.Context, id *int) (*int, error) {
-	panic(fmt.Errorf("not implemented: DeleteItem - deleteItem"))
+	var Item services.Item
+	err := Item.DeleteItem(int64(*id))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return id, nil
 }
 
 // SellItem is the resolver for the sellItem field.
@@ -78,7 +97,7 @@ func (r *mutationResolver) DeleteDepartment(ctx context.Context, id *int) (*int,
 	if err != nil {
 		log.Fatal(err)
 	}
-	
+
 	return id, nil
 }
 
@@ -112,32 +131,69 @@ func (r *mutationResolver) DeleteAisle(ctx context.Context, id *int) (*int, erro
 	if err != nil {
 		log.Fatal(err)
 	}
-	
-	return id, nil}
+
+	return id, nil
+}
 
 // AddManager is the resolver for the addManager field.
 func (r *mutationResolver) AddManager(ctx context.Context, input *model.NewManager) (*model.Manager, error) {
-	panic(fmt.Errorf("not implemented: AddManager - addManager"))
+	var Manager services.Manager
+	id, err := Manager.AddManager(input)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Printf("res: %v\n", id)
+	return &model.Manager{ID: int(id), FirstName: input.FirstName, LastName: input.LastName, DepartmentID: &input.DepartmentID}, nil
 }
 
 // UpdateManager is the resolver for the updateManager field.
 func (r *mutationResolver) UpdateManager(ctx context.Context, input *model.UpdateManager) (*model.Manager, error) {
-	panic(fmt.Errorf("not implemented: UpdateManager - updateManager"))
+	var Manager services.Manager
+	id, err := Manager.UpdateManager(input)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return &model.Manager{ID: int(id), FirstName: input.FirstName, LastName: input.LastName, DepartmentID: &input.DepartmentID}, nil
 }
 
 // DeleteManager is the resolver for the deleteManager field.
 func (r *mutationResolver) DeleteManager(ctx context.Context, id *int) (*int, error) {
-	panic(fmt.Errorf("not implemented: DeleteManager - deleteManager"))
+	var Manager services.Manager
+	err := Manager.DeleteManager(int64(*id))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return id, nil
 }
 
 // GetAllItems is the resolver for the getAllItems field.
 func (r *queryResolver) GetAllItems(ctx context.Context) ([]*model.Item, error) {
-	panic(fmt.Errorf("not implemented: GetAllItems - getAllItems"))
+	var Item services.Item
+	var resItems []*model.Item
+	dbItems, err := Item.GetAllItems()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for _, item := range dbItems {
+		resItems = append(resItems, &model.Item{ID: item.ID, Name: item.Name, Price: item.Price, Qty: item.Qty, Category: item.Category, Promotion: item.Promotion, PromotionPrice: item.PromotionPrice, Replenish: item.Replenish, TotalSalesWeekItem: item.TotalSalesWeekItem, AisleID: item.AisleID, DepartmentID: item.DepartmentID})
+	}
+
+	return resItems, nil
 }
 
 // GetItemByID is the resolver for the getItemById field.
 func (r *queryResolver) GetItemByID(ctx context.Context, id *int) (*model.Item, error) {
-	panic(fmt.Errorf("not implemented: GetItemByID - getItemById"))
+	var Item services.Item
+	item, err := Item.GetItemById(int64(*id))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return item, err
 }
 
 // GetTopItems is the resolver for the getTopItems field.
@@ -195,7 +251,8 @@ func (r *queryResolver) GetAllAisles(ctx context.Context) ([]*model.Aisle, error
 		resAisles = append(resAisles, &model.Aisle{ID: aisle.ID, DepartmentID: aisle.DepartmentID, CreatedAt: aisle.CreatedAt, UpdatedAt: aisle.UpdatedAt})
 	}
 
-	return resAisles, nil}
+	return resAisles, nil
+}
 
 // GetAisleByID is the resolver for the getAisleById field.
 func (r *queryResolver) GetAisleByID(ctx context.Context, id *int) (*model.Aisle, error) {
@@ -205,16 +262,34 @@ func (r *queryResolver) GetAisleByID(ctx context.Context, id *int) (*model.Aisle
 		log.Fatal(err)
 	}
 
-	return aisle, err}
+	return aisle, err
+}
 
 // GetAllManagers is the resolver for the getAllManagers field.
 func (r *queryResolver) GetAllManagers(ctx context.Context) ([]*model.Manager, error) {
-	panic(fmt.Errorf("not implemented: GetAllManagers - getAllManagers"))
+	var Manager services.Manager
+	var resManagers []*model.Manager
+	dbManagers, err := Manager.GetAllManagers()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for _, manager := range dbManagers {
+		resManagers = append(resManagers, &model.Manager{ID: manager.ID, FirstName: manager.FirstName, LastName: manager.LastName, DepartmentID: manager.DepartmentID, CreatedAt: manager.CreatedAt, UpdatedAt: manager.UpdatedAt})
+	}
+
+	return resManagers, nil
 }
 
 // GetManagerByID is the resolver for the getManagerById field.
 func (r *queryResolver) GetManagerByID(ctx context.Context, id *int) (*model.Manager, error) {
-	panic(fmt.Errorf("not implemented: GetManagerByID - getManagerById"))
+	var Manager services.Manager
+	manager, err := Manager.GetManagerById(int64(*id))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return manager, err
 }
 
 // Mutation returns MutationResolver implementation.

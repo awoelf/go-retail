@@ -56,7 +56,7 @@ func (m *Manager) GetAllManagers() ([]*model.Manager, error) {
 	return managers, nil
 }
 
-func (m *Manager) GetManagerByID(id int64) (*model.Manager, error) {
+func (m *Manager) GetManagerById(id int64) (*model.Manager, error) {
 	stmt, err := config.DB.Prepare("SELECT * FROM Managers WHERE ID = ?")
 	if err != nil {
 		log.Fatal(err)

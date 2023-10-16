@@ -60,9 +60,9 @@ type NewItem struct {
 }
 
 type NewManager struct {
-	FirstName    string  `json:"firstName"`
-	LastName     string  `json:"lastName"`
-	DepartmentID *string `json:"departmentId,omitempty"`
+	FirstName    string `json:"firstName"`
+	LastName     string `json:"lastName"`
+	DepartmentID string `json:"departmentId"`
 }
 
 type UpdateAisle struct {
