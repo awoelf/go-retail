@@ -84,18 +84,36 @@ func (r *mutationResolver) DeleteDepartment(ctx context.Context, id *int) (*int,
 
 // AddAisle is the resolver for the addAisle field.
 func (r *mutationResolver) AddAisle(ctx context.Context, input *model.NewAisle) (*model.Aisle, error) {
-	panic(fmt.Errorf("not implemented: AddAisle - addAisle"))
+	var Aisle services.Aisle
+	id, err := Aisle.AddAisle(input)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Printf("res: %v\n", id)
+	return &model.Aisle{ID: int(id), DepartmentID: input.DepartmentID}, nil
 }
 
 // UpdateAisle is the resolver for the updateAisle field.
 func (r *mutationResolver) UpdateAisle(ctx context.Context, input *model.UpdateAisle) (*model.Aisle, error) {
-	panic(fmt.Errorf("not implemented: UpdateAisle - updateAisle"))
+	var Aisle services.Aisle
+	id, err := Aisle.UpdateAisle(input)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return &model.Aisle{ID: int(id), DepartmentID: input.DepartmentID}, nil
 }
 
 // DeleteAisle is the resolver for the deleteAisle field.
 func (r *mutationResolver) DeleteAisle(ctx context.Context, id *int) (*int, error) {
-	panic(fmt.Errorf("not implemented: DeleteAisle - deleteAisle"))
-}
+	var Aisle services.Aisle
+	err := Aisle.DeleteAisle(int64(*id))
+	if err != nil {
+		log.Fatal(err)
+	}
+	
+	return id, nil}
 
 // AddManager is the resolver for the addManager field.
 func (r *mutationResolver) AddManager(ctx context.Context, input *model.NewManager) (*model.Manager, error) {
@@ -166,13 +184,28 @@ func (r *queryResolver) GetTopDepartments(ctx context.Context) ([]*model.Departm
 
 // GetAllAisles is the resolver for the getAllAisles field.
 func (r *queryResolver) GetAllAisles(ctx context.Context) ([]*model.Aisle, error) {
-	panic(fmt.Errorf("not implemented: GetAllAisles - getAllAisles"))
-}
+	var Aisle services.Aisle
+	var resAisles []*model.Aisle
+	dbAisles, err := Aisle.GetAllAisles()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for _, aisle := range dbAisles {
+		resAisles = append(resAisles, &model.Aisle{ID: aisle.ID, DepartmentID: aisle.DepartmentID, CreatedAt: aisle.CreatedAt, UpdatedAt: aisle.UpdatedAt})
+	}
+
+	return resAisles, nil}
 
 // GetAisleByID is the resolver for the getAisleById field.
 func (r *queryResolver) GetAisleByID(ctx context.Context, id *int) (*model.Aisle, error) {
-	panic(fmt.Errorf("not implemented: GetAisleByID - getAisleById"))
-}
+	var Aisle services.Aisle
+	aisle, err := Aisle.GetAisleById(int64(*id))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return aisle, err}
 
 // GetAllManagers is the resolver for the getAllManagers field.
 func (r *queryResolver) GetAllManagers(ctx context.Context) ([]*model.Manager, error) {
