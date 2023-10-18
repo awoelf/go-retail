@@ -16,7 +16,7 @@ import (
 // AddItem is the resolver for the addItem field.
 func (r *mutationResolver) AddItem(ctx context.Context, input *model.NewItem) (*model.Item, error) {
 	var Item services.Item
-	id, err := Item.AddItem(input)
+	id, err := Item.AddItem(ctx, input)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -28,7 +28,7 @@ func (r *mutationResolver) AddItem(ctx context.Context, input *model.NewItem) (*
 // UpdateItem is the resolver for the updateItem field.
 func (r *mutationResolver) UpdateItem(ctx context.Context, input *model.UpdateItem) (*model.Item, error) {
 	var Item services.Item
-	id, err := Item.UpdateItem(input)
+	id, err := Item.UpdateItem(ctx, input)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -39,7 +39,7 @@ func (r *mutationResolver) UpdateItem(ctx context.Context, input *model.UpdateIt
 // DeleteItem is the resolver for the deleteItem field.
 func (r *mutationResolver) DeleteItem(ctx context.Context, id *int) (*int, error) {
 	var Item services.Item
-	err := Item.DeleteItem(int64(*id))
+	err := Item.DeleteItem(ctx, int64(*id))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -70,7 +70,7 @@ func (r *mutationResolver) SetSaleItem(ctx context.Context) (*model.Item, error)
 // AddDepartment is the resolver for the addDepartment field.
 func (r *mutationResolver) AddDepartment(ctx context.Context, input *model.NewDepartment) (*model.Department, error) {
 	var Department services.Department
-	id, err := Department.AddDepartment(input)
+	id, err := Department.AddDepartment(ctx, input)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -82,7 +82,7 @@ func (r *mutationResolver) AddDepartment(ctx context.Context, input *model.NewDe
 // UpdateDepartment is the resolver for the updateDepartment field.
 func (r *mutationResolver) UpdateDepartment(ctx context.Context, input *model.UpdateDepartment) (*model.Department, error) {
 	var Department services.Department
-	id, err := Department.UpdateDepartment(input)
+	id, err := Department.UpdateDepartment(ctx, input)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -93,7 +93,7 @@ func (r *mutationResolver) UpdateDepartment(ctx context.Context, input *model.Up
 // DeleteDepartment is the resolver for the deleteDepartment field.
 func (r *mutationResolver) DeleteDepartment(ctx context.Context, id *int) (*int, error) {
 	var Department services.Department
-	err := Department.DeleteDepartment(int64(*id))
+	err := Department.DeleteDepartment(ctx, int64(*id))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -104,7 +104,7 @@ func (r *mutationResolver) DeleteDepartment(ctx context.Context, id *int) (*int,
 // AddManager is the resolver for the addManager field.
 func (r *mutationResolver) AddManager(ctx context.Context, input *model.NewManager) (*model.Manager, error) {
 	var Manager services.Manager
-	id, err := Manager.AddManager(input)
+	id, err := Manager.AddManager(ctx, input)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -116,7 +116,7 @@ func (r *mutationResolver) AddManager(ctx context.Context, input *model.NewManag
 // UpdateManager is the resolver for the updateManager field.
 func (r *mutationResolver) UpdateManager(ctx context.Context, input *model.UpdateManager) (*model.Manager, error) {
 	var Manager services.Manager
-	id, err := Manager.UpdateManager(input)
+	id, err := Manager.UpdateManager(ctx, input)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -127,7 +127,7 @@ func (r *mutationResolver) UpdateManager(ctx context.Context, input *model.Updat
 // DeleteManager is the resolver for the deleteManager field.
 func (r *mutationResolver) DeleteManager(ctx context.Context, id *int) (*int, error) {
 	var Manager services.Manager
-	err := Manager.DeleteManager(int64(*id))
+	err := Manager.DeleteManager(ctx, int64(*id))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -139,7 +139,7 @@ func (r *mutationResolver) DeleteManager(ctx context.Context, id *int) (*int, er
 func (r *queryResolver) GetAllItems(ctx context.Context) ([]*model.Item, error) {
 	var Item services.Item
 	var resItems []*model.Item
-	dbItems, err := Item.GetAllItems()
+	dbItems, err := Item.GetAllItems(ctx)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -154,7 +154,7 @@ func (r *queryResolver) GetAllItems(ctx context.Context) ([]*model.Item, error) 
 // GetItemByID is the resolver for the getItemById field.
 func (r *queryResolver) GetItemByID(ctx context.Context, id *int) (*model.Item, error) {
 	var Item services.Item
-	item, err := Item.GetItemById(int64(*id))
+	item, err := Item.GetItemById(ctx, int64(*id))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -176,7 +176,7 @@ func (r *queryResolver) GetItemsByCategory(ctx context.Context, category *string
 func (r *queryResolver) GetAllDepartments(ctx context.Context) ([]*model.Department, error) {
 	var Department services.Department
 	var resDepartments []*model.Department
-	dbDepartments, err := Department.GetAllDepartments()
+	dbDepartments, err := Department.GetAllDepartments(ctx)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -191,7 +191,7 @@ func (r *queryResolver) GetAllDepartments(ctx context.Context) ([]*model.Departm
 // GetDepartmentByID is the resolver for the getDepartmentById field.
 func (r *queryResolver) GetDepartmentByID(ctx context.Context, id *int) (*model.Department, error) {
 	var Department services.Department
-	department, err := Department.GetDepartmentById(int64(*id))
+	department, err := Department.GetDepartmentById(ctx, int64(*id))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -208,7 +208,7 @@ func (r *queryResolver) GetTopDepartments(ctx context.Context) ([]*model.Departm
 func (r *queryResolver) GetAllManagers(ctx context.Context) ([]*model.Manager, error) {
 	var Manager services.Manager
 	var resManagers []*model.Manager
-	dbManagers, err := Manager.GetAllManagers()
+	dbManagers, err := Manager.GetAllManagers(ctx)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -223,7 +223,7 @@ func (r *queryResolver) GetAllManagers(ctx context.Context) ([]*model.Manager, e
 // GetManagerByID is the resolver for the getManagerById field.
 func (r *queryResolver) GetManagerByID(ctx context.Context, id *int) (*model.Manager, error) {
 	var Manager services.Manager
-	manager, err := Manager.GetManagerById(int64(*id))
+	manager, err := Manager.GetManagerById(ctx, int64(*id))
 	if err != nil {
 		log.Fatal(err)
 	}
