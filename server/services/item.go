@@ -10,12 +10,12 @@ import (
 type Item struct{ model.Item }
 
 func (i *Item) AddItem(input *model.NewItem) (int64, error) {
-	stmt, err := config.DB.Prepare("INSERT INTO Items(Name, Price, Qty, Category, AisleID) VALUES(?,?,?,?,?)")
+	stmt, err := config.DB.Prepare("INSERT INTO Items(Name, Price, Qty, Category, Aisle, DepartmentID) VALUES(?,?,?,?,?,?)")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	res, err := stmt.Exec(input.Name, input.Price, input.Qty, input.Category, input.AisleID)
+	res, err := stmt.Exec(input.Name, input.Price, input.Qty, input.Category, input.Aisle, input.DepartmentID)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -44,7 +44,7 @@ func (i *Item) GetAllItems() ([]*model.Item, error) {
 
 	for res.Next() {
 		var item model.Item
-		err := res.Scan(&item.ID, &item.Name, &item.Price, &item.Qty, &item.Category, &item.Promotion, &item.PromotionPrice, &item.Replenish, &item.TotalSalesWeekItem, &item.AisleID, &item.CreatedAt, &item.UpdatedAt)
+		err := res.Scan(&item.ID, &item.Name, &item.Price, &item.Qty, &item.Category, &item.Promotion, &item.PromotionPrice, &item.Replenish, &item.TotalSalesWeekItem, &item.Aisle, &item.DepartmentID, &item.CreatedAt, &item.UpdatedAt)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -66,7 +66,7 @@ func (i *Item) GetItemById(id int64) (*model.Item, error) {
 	var item model.Item
 
 	for res.Next() {
-		err = res.Scan(&item.ID, &item.Name, &item.Price, &item.Qty, &item.Category, &item.Promotion, &item.PromotionPrice, &item.Replenish, &item.TotalSalesWeekItem, &item.AisleID, &item.CreatedAt, &item.UpdatedAt)
+		err = res.Scan(&item.ID, &item.Name, &item.Price, &item.Qty, &item.Category, &item.Promotion, &item.PromotionPrice, &item.Replenish, &item.TotalSalesWeekItem, &item.Aisle, &item.DepartmentID, &item.CreatedAt, &item.UpdatedAt)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -76,12 +76,12 @@ func (i *Item) GetItemById(id int64) (*model.Item, error) {
 }
 
 func (i *Item) UpdateItem(input *model.UpdateItem) (int64, error) {
-	stmt, err := config.DB.Prepare("UPDATE Items SET Name = ?, Price = ?, Qty = ?, Category = ?, Promotion = ?, PromotionPrice = ?, Replenish = ?, TotalSalesWeekItem = ?, AisleID = ?, UpdatedAt = NOW() WHERE ID = ?")
+	stmt, err := config.DB.Prepare("UPDATE Items SET Name = ?, Price = ?, Qty = ?, Category = ?, Promotion = ?, PromotionPrice = ?, Replenish = ?, TotalSalesWeekItem = ?, Aisle = ?, DepartmentID = ?, UpdatedAt = NOW() WHERE ID = ?")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	res, err := stmt.Exec(input.Name, input.Price, input.Qty, input.Category, input.Promotion, input.PromotionPrice, input.Replenish, input.TotalSalesWeekItem, input.AisleID, input.ID)
+	res, err := stmt.Exec(input.Name, input.Price, input.Qty, input.Category, input.Promotion, input.PromotionPrice, input.Replenish, input.TotalSalesWeekItem, input.Aisle, input.DepartmentID, input.ID)
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -14,8 +14,8 @@ type Item {
 	promotionPrice: Float
 	replenish: Boolean
 	totalSalesWeekItem: Float
-	aisleId: String! # FK (Foreign Key)
-	departmentId: String! # FK
+	aisle: Int!
+	departmentId: Int! # FK
 	createdAt: String
 	updatedAt: String
 }
@@ -28,20 +28,13 @@ type Department {
 	updatedAt: String
 }
 
-type Aisle {
-	id: Int!
-	departmentId: String! # FK
-	createdAt: String
-	updatedAt: String
-}
-
 # Later, I might implement an Employee model,
 # and the manager model will be an extension of it.
 type Manager {
 	id: Int!
 	firstName: String!
 	lastName: String!
-	departmentId: String # FK
+	departmentId: Int # FK
 	createdAt: String
 	updatedAt: String
 }
@@ -51,8 +44,8 @@ input NewItem {
 	price: Float!
 	qty: Int!
 	category: String!
-	aisleId: String! # FK
-	departmentId: String! # FK
+	aisle: Int!
+	departmentId: Int! # FK
 }
 
 input UpdateItem {
@@ -65,17 +58,8 @@ input UpdateItem {
 	promotionPrice: Float!
 	replenish: Boolean!
 	totalSalesWeekItem: Float!
-	aisleId: String!
-	departmentId: String!
-}
-
-input NewAisle {
-	departmentId: String! # FK
-}
-
-input UpdateAisle {
-	id: Int!
-	departmentId: String!
+	aisle: Int!
+	departmentId: Int!
 }
 
 input NewDepartment {
@@ -91,14 +75,14 @@ input UpdateDepartment {
 input NewManager {
 	firstName: String!
 	lastName: String!
-	departmentId: String!
+	departmentId: Int!
 }
 
 input UpdateManager {
 	id: Int!
 	firstName: String!
 	lastName: String!
-	departmentId: String!
+	departmentId: Int!
 }
 
 type Query {
@@ -109,8 +93,6 @@ type Query {
 	getAllDepartments: [Department]
 	getDepartmentById(id: Int): Department
 	getTopDepartments: [Department]
-	getAllAisles: [Aisle]
-	getAisleById(id: Int): Aisle
 	getAllManagers: [Manager]
 	getManagerById(id: Int): Manager
 }
@@ -126,9 +108,6 @@ type Mutation {
 	addDepartment(input: NewDepartment): Department
 	updateDepartment(input: UpdateDepartment): Department
 	deleteDepartment(id: Int): Int
-	addAisle(input: NewAisle): Aisle
-	updateAisle(input: UpdateAisle): Aisle
-	deleteAisle(id: Int): Int
 	addManager(input: NewManager): Manager
 	updateManager(input: UpdateManager): Manager
 	deleteManager(id: Int): Int
