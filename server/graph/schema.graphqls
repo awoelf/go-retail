@@ -13,7 +13,7 @@ type Item {
 	promotion: Boolean
 	promotionPrice: Float
 	replenish: Boolean
-	totalSalesWeekItem: Float
+	totalSalesItem: Float
 	aisle: Int!
 	departmentId: Int! # FK
 	createdAt: String
@@ -23,7 +23,7 @@ type Item {
 type Department {
 	id: Int!
 	name: String!
-	totalSalesWeekDept: Float
+	totalSalesDept: Float
 	createdAt: String
 	updatedAt: String
 }
@@ -57,7 +57,7 @@ input UpdateItem {
 	promotion: Boolean!
 	promotionPrice: Float!
 	replenish: Boolean!
-	totalSalesWeekItem: Float!
+	totalSalesItem: Float!
 	aisle: Int!
 	departmentId: Int!
 }
@@ -69,7 +69,7 @@ input NewDepartment {
 input UpdateDepartment {
 	id: Int!
 	name: String!
-	totalSalesWeekDept: Float!
+	totalSalesDept: Float!
 }
 
 input NewManager {

@@ -3,27 +3,27 @@
 package model
 
 type Department struct {
-	ID                 int      `json:"id"`
-	Name               string   `json:"name"`
-	TotalSalesWeekDept *float64 `json:"totalSalesWeekDept,omitempty"`
-	CreatedAt          *string  `json:"createdAt,omitempty"`
-	UpdatedAt          *string  `json:"updatedAt,omitempty"`
+	ID             int      `json:"id"`
+	Name           string   `json:"name"`
+	TotalSalesDept *float64 `json:"totalSalesDept,omitempty"`
+	CreatedAt      *string  `json:"createdAt,omitempty"`
+	UpdatedAt      *string  `json:"updatedAt,omitempty"`
 }
 
 type Item struct {
-	ID                 int      `json:"id"`
-	Name               string   `json:"name"`
-	Price              float64  `json:"price"`
-	Qty                int      `json:"qty"`
-	Category           string   `json:"category"`
-	Promotion          *bool    `json:"promotion,omitempty"`
-	PromotionPrice     *float64 `json:"promotionPrice,omitempty"`
-	Replenish          *bool    `json:"replenish,omitempty"`
-	TotalSalesWeekItem *float64 `json:"totalSalesWeekItem,omitempty"`
-	Aisle              int      `json:"aisle"`
-	DepartmentID       int      `json:"departmentId"`
-	CreatedAt          *string  `json:"createdAt,omitempty"`
-	UpdatedAt          *string  `json:"updatedAt,omitempty"`
+	ID             int      `json:"id"`
+	Name           string   `json:"name"`
+	Price          float64  `json:"price"`
+	Qty            int      `json:"qty"`
+	Category       string   `json:"category"`
+	Promotion      *bool    `json:"promotion,omitempty"`
+	PromotionPrice *float64 `json:"promotionPrice,omitempty"`
+	Replenish      *bool    `json:"replenish,omitempty"`
+	TotalSalesItem *float64 `json:"totalSalesItem,omitempty"`
+	Aisle          int      `json:"aisle"`
+	DepartmentID   int      `json:"departmentId"`
+	CreatedAt      *string  `json:"createdAt,omitempty"`
+	UpdatedAt      *string  `json:"updatedAt,omitempty"`
 }
 
 type Manager struct {
@@ -55,23 +55,23 @@ type NewManager struct {
 }
 
 type UpdateDepartment struct {
-	ID                 int     `json:"id"`
-	Name               string  `json:"name"`
-	TotalSalesWeekDept float64 `json:"totalSalesWeekDept"`
+	ID             int     `json:"id"`
+	Name           string  `json:"name"`
+	TotalSalesDept float64 `json:"totalSalesDept"`
 }
 
 type UpdateItem struct {
-	ID                 int     `json:"id"`
-	Name               string  `json:"name"`
-	Price              float64 `json:"price"`
-	Qty                int     `json:"qty"`
-	Category           string  `json:"category"`
-	Promotion          bool    `json:"promotion"`
-	PromotionPrice     float64 `json:"promotionPrice"`
-	Replenish          bool    `json:"replenish"`
-	TotalSalesWeekItem float64 `json:"totalSalesWeekItem"`
-	Aisle              int     `json:"aisle"`
-	DepartmentID       int     `json:"departmentId"`
+	ID             int     `json:"id"`
+	Name           string  `json:"name"`
+	Price          float64 `json:"price"`
+	Qty            int     `json:"qty"`
+	Category       string  `json:"category"`
+	Promotion      bool    `json:"promotion"`
+	PromotionPrice float64 `json:"promotionPrice"`
+	Replenish      bool    `json:"replenish"`
+	TotalSalesItem float64 `json:"totalSalesItem"`
+	Aisle          int     `json:"aisle"`
+	DepartmentID   int     `json:"departmentId"`
 }
 
 type UpdateManager struct {

@@ -33,7 +33,7 @@ func (r *mutationResolver) UpdateItem(ctx context.Context, input *model.UpdateIt
 		log.Fatal(err)
 	}
 
-	return &model.Item{ID: int(id), Name: input.Name, Price: input.Price, Qty: input.Qty, Category: input.Category, Promotion: &input.Promotion, PromotionPrice: &input.PromotionPrice, Replenish: &input.Replenish, TotalSalesWeekItem: &input.TotalSalesWeekItem, Aisle: input.Aisle}, nil
+	return &model.Item{ID: int(id), Name: input.Name, Price: input.Price, Qty: input.Qty, Category: input.Category, Promotion: &input.Promotion, PromotionPrice: &input.PromotionPrice, Replenish: &input.Replenish, TotalSalesItem: &input.TotalSalesItem, Aisle: input.Aisle}, nil
 }
 
 // DeleteItem is the resolver for the deleteItem field.
@@ -87,7 +87,7 @@ func (r *mutationResolver) UpdateDepartment(ctx context.Context, input *model.Up
 		log.Fatal(err)
 	}
 
-	return &model.Department{ID: int(id), Name: input.Name, TotalSalesWeekDept: &input.TotalSalesWeekDept}, nil
+	return &model.Department{ID: int(id), Name: input.Name, TotalSalesDept: &input.TotalSalesDept}, nil
 }
 
 // DeleteDepartment is the resolver for the deleteDepartment field.
@@ -145,7 +145,7 @@ func (r *queryResolver) GetAllItems(ctx context.Context) ([]*model.Item, error) 
 	}
 
 	for _, item := range dbItems {
-		resItems = append(resItems, &model.Item{ID: item.ID, Name: item.Name, Price: item.Price, Qty: item.Qty, Category: item.Category, Promotion: item.Promotion, PromotionPrice: item.PromotionPrice, Replenish: item.Replenish, TotalSalesWeekItem: item.TotalSalesWeekItem, Aisle: item.Aisle, DepartmentID: item.DepartmentID})
+		resItems = append(resItems, &model.Item{ID: item.ID, Name: item.Name, Price: item.Price, Qty: item.Qty, Category: item.Category, Promotion: item.Promotion, PromotionPrice: item.PromotionPrice, Replenish: item.Replenish, TotalSalesItem: item.TotalSalesItem, Aisle: item.Aisle, DepartmentID: item.DepartmentID})
 	}
 
 	return resItems, nil
@@ -182,7 +182,7 @@ func (r *queryResolver) GetAllDepartments(ctx context.Context) ([]*model.Departm
 	}
 
 	for _, department := range dbDepartments {
-		resDepartments = append(resDepartments, &model.Department{ID: department.ID, Name: department.Name, TotalSalesWeekDept: department.TotalSalesWeekDept, CreatedAt: department.CreatedAt, UpdatedAt: department.UpdatedAt})
+		resDepartments = append(resDepartments, &model.Department{ID: department.ID, Name: department.Name, TotalSalesDept: department.TotalSalesDept, CreatedAt: department.CreatedAt, UpdatedAt: department.UpdatedAt})
 	}
 
 	return resDepartments, nil

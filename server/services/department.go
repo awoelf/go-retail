@@ -46,7 +46,7 @@ func (d *Department) GetAllDepartments() ([]*model.Department, error) {
 
 	for res.Next() {
 		var department model.Department
-		err := res.Scan(&department.ID, &department.Name, &department.TotalSalesWeekDept, &department.CreatedAt, &department.UpdatedAt)
+		err := res.Scan(&department.ID, &department.Name, &department.TotalSalesDept, &department.CreatedAt, &department.UpdatedAt)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -68,7 +68,7 @@ func (d *Department) GetDepartmentById(id int64) (*model.Department, error) {
 	var department model.Department
 
 	for res.Next() {
-		err = res.Scan(&department.ID, &department.Name, &department.TotalSalesWeekDept, &department.CreatedAt, &department.UpdatedAt)
+		err = res.Scan(&department.ID, &department.Name, &department.TotalSalesDept, &department.CreatedAt, &department.UpdatedAt)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -78,12 +78,12 @@ func (d *Department) GetDepartmentById(id int64) (*model.Department, error) {
 }
 
 func (d *Department) UpdateDepartment(input *model.UpdateDepartment) (int64, error) {
-	stmt, err := config.DB.Prepare("UPDATE Departments SET Name = ?, TotalSalesWeekDept = ?, UpdatedAt = NOW() WHERE ID = ?")
+	stmt, err := config.DB.Prepare("UPDATE Departments SET Name = ?, TotalSalesDept = ?, UpdatedAt = NOW() WHERE ID = ?")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	res, err := stmt.Exec(input.Name, input.TotalSalesWeekDept, input.ID)
+	res, err := stmt.Exec(input.Name, input.TotalSalesDept, input.ID)
 	if err != nil {
 		log.Fatal(err)
 	}

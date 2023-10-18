@@ -48,27 +48,27 @@ type DirectiveRoot struct {
 
 type ComplexityRoot struct {
 	Department struct {
-		CreatedAt          func(childComplexity int) int
-		ID                 func(childComplexity int) int
-		Name               func(childComplexity int) int
-		TotalSalesWeekDept func(childComplexity int) int
-		UpdatedAt          func(childComplexity int) int
+		CreatedAt      func(childComplexity int) int
+		ID             func(childComplexity int) int
+		Name           func(childComplexity int) int
+		TotalSalesDept func(childComplexity int) int
+		UpdatedAt      func(childComplexity int) int
 	}
 
 	Item struct {
-		Aisle              func(childComplexity int) int
-		Category           func(childComplexity int) int
-		CreatedAt          func(childComplexity int) int
-		DepartmentID       func(childComplexity int) int
-		ID                 func(childComplexity int) int
-		Name               func(childComplexity int) int
-		Price              func(childComplexity int) int
-		Promotion          func(childComplexity int) int
-		PromotionPrice     func(childComplexity int) int
-		Qty                func(childComplexity int) int
-		Replenish          func(childComplexity int) int
-		TotalSalesWeekItem func(childComplexity int) int
-		UpdatedAt          func(childComplexity int) int
+		Aisle          func(childComplexity int) int
+		Category       func(childComplexity int) int
+		CreatedAt      func(childComplexity int) int
+		DepartmentID   func(childComplexity int) int
+		ID             func(childComplexity int) int
+		Name           func(childComplexity int) int
+		Price          func(childComplexity int) int
+		Promotion      func(childComplexity int) int
+		PromotionPrice func(childComplexity int) int
+		Qty            func(childComplexity int) int
+		Replenish      func(childComplexity int) int
+		TotalSalesItem func(childComplexity int) int
+		UpdatedAt      func(childComplexity int) int
 	}
 
 	Manager struct {
@@ -176,12 +176,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Department.Name(childComplexity), true
 
-	case "Department.totalSalesWeekDept":
-		if e.complexity.Department.TotalSalesWeekDept == nil {
+	case "Department.totalSalesDept":
+		if e.complexity.Department.TotalSalesDept == nil {
 			break
 		}
 
-		return e.complexity.Department.TotalSalesWeekDept(childComplexity), true
+		return e.complexity.Department.TotalSalesDept(childComplexity), true
 
 	case "Department.updatedAt":
 		if e.complexity.Department.UpdatedAt == nil {
@@ -267,12 +267,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Item.Replenish(childComplexity), true
 
-	case "Item.totalSalesWeekItem":
-		if e.complexity.Item.TotalSalesWeekItem == nil {
+	case "Item.totalSalesItem":
+		if e.complexity.Item.TotalSalesItem == nil {
 			break
 		}
 
-		return e.complexity.Item.TotalSalesWeekItem(childComplexity), true
+		return e.complexity.Item.TotalSalesItem(childComplexity), true
 
 	case "Item.updatedAt":
 		if e.complexity.Item.UpdatedAt == nil {
@@ -1008,8 +1008,8 @@ func (ec *executionContext) fieldContext_Department_name(ctx context.Context, fi
 	return fc, nil
 }
 
-func (ec *executionContext) _Department_totalSalesWeekDept(ctx context.Context, field graphql.CollectedField, obj *model.Department) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Department_totalSalesWeekDept(ctx, field)
+func (ec *executionContext) _Department_totalSalesDept(ctx context.Context, field graphql.CollectedField, obj *model.Department) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Department_totalSalesDept(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -1022,7 +1022,7 @@ func (ec *executionContext) _Department_totalSalesWeekDept(ctx context.Context, 
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.TotalSalesWeekDept, nil
+		return obj.TotalSalesDept, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1036,7 +1036,7 @@ func (ec *executionContext) _Department_totalSalesWeekDept(ctx context.Context, 
 	return ec.marshalOFloat2ᚖfloat64(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Department_totalSalesWeekDept(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Department_totalSalesDept(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Department",
 		Field:      field,
@@ -1474,8 +1474,8 @@ func (ec *executionContext) fieldContext_Item_replenish(ctx context.Context, fie
 	return fc, nil
 }
 
-func (ec *executionContext) _Item_totalSalesWeekItem(ctx context.Context, field graphql.CollectedField, obj *model.Item) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Item_totalSalesWeekItem(ctx, field)
+func (ec *executionContext) _Item_totalSalesItem(ctx context.Context, field graphql.CollectedField, obj *model.Item) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Item_totalSalesItem(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -1488,7 +1488,7 @@ func (ec *executionContext) _Item_totalSalesWeekItem(ctx context.Context, field 
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.TotalSalesWeekItem, nil
+		return obj.TotalSalesItem, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1502,7 +1502,7 @@ func (ec *executionContext) _Item_totalSalesWeekItem(ctx context.Context, field 
 	return ec.marshalOFloat2ᚖfloat64(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Item_totalSalesWeekItem(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Item_totalSalesItem(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Item",
 		Field:      field,
@@ -1992,8 +1992,8 @@ func (ec *executionContext) fieldContext_Mutation_addItem(ctx context.Context, f
 				return ec.fieldContext_Item_promotionPrice(ctx, field)
 			case "replenish":
 				return ec.fieldContext_Item_replenish(ctx, field)
-			case "totalSalesWeekItem":
-				return ec.fieldContext_Item_totalSalesWeekItem(ctx, field)
+			case "totalSalesItem":
+				return ec.fieldContext_Item_totalSalesItem(ctx, field)
 			case "aisle":
 				return ec.fieldContext_Item_aisle(ctx, field)
 			case "departmentId":
@@ -2072,8 +2072,8 @@ func (ec *executionContext) fieldContext_Mutation_updateItem(ctx context.Context
 				return ec.fieldContext_Item_promotionPrice(ctx, field)
 			case "replenish":
 				return ec.fieldContext_Item_replenish(ctx, field)
-			case "totalSalesWeekItem":
-				return ec.fieldContext_Item_totalSalesWeekItem(ctx, field)
+			case "totalSalesItem":
+				return ec.fieldContext_Item_totalSalesItem(ctx, field)
 			case "aisle":
 				return ec.fieldContext_Item_aisle(ctx, field)
 			case "departmentId":
@@ -2204,8 +2204,8 @@ func (ec *executionContext) fieldContext_Mutation_sellItem(ctx context.Context, 
 				return ec.fieldContext_Item_promotionPrice(ctx, field)
 			case "replenish":
 				return ec.fieldContext_Item_replenish(ctx, field)
-			case "totalSalesWeekItem":
-				return ec.fieldContext_Item_totalSalesWeekItem(ctx, field)
+			case "totalSalesItem":
+				return ec.fieldContext_Item_totalSalesItem(ctx, field)
 			case "aisle":
 				return ec.fieldContext_Item_aisle(ctx, field)
 			case "departmentId":
@@ -2273,8 +2273,8 @@ func (ec *executionContext) fieldContext_Mutation_returnItem(ctx context.Context
 				return ec.fieldContext_Item_promotionPrice(ctx, field)
 			case "replenish":
 				return ec.fieldContext_Item_replenish(ctx, field)
-			case "totalSalesWeekItem":
-				return ec.fieldContext_Item_totalSalesWeekItem(ctx, field)
+			case "totalSalesItem":
+				return ec.fieldContext_Item_totalSalesItem(ctx, field)
 			case "aisle":
 				return ec.fieldContext_Item_aisle(ctx, field)
 			case "departmentId":
@@ -2342,8 +2342,8 @@ func (ec *executionContext) fieldContext_Mutation_orderItems(ctx context.Context
 				return ec.fieldContext_Item_promotionPrice(ctx, field)
 			case "replenish":
 				return ec.fieldContext_Item_replenish(ctx, field)
-			case "totalSalesWeekItem":
-				return ec.fieldContext_Item_totalSalesWeekItem(ctx, field)
+			case "totalSalesItem":
+				return ec.fieldContext_Item_totalSalesItem(ctx, field)
 			case "aisle":
 				return ec.fieldContext_Item_aisle(ctx, field)
 			case "departmentId":
@@ -2411,8 +2411,8 @@ func (ec *executionContext) fieldContext_Mutation_setSaleItem(ctx context.Contex
 				return ec.fieldContext_Item_promotionPrice(ctx, field)
 			case "replenish":
 				return ec.fieldContext_Item_replenish(ctx, field)
-			case "totalSalesWeekItem":
-				return ec.fieldContext_Item_totalSalesWeekItem(ctx, field)
+			case "totalSalesItem":
+				return ec.fieldContext_Item_totalSalesItem(ctx, field)
 			case "aisle":
 				return ec.fieldContext_Item_aisle(ctx, field)
 			case "departmentId":
@@ -2468,8 +2468,8 @@ func (ec *executionContext) fieldContext_Mutation_addDepartment(ctx context.Cont
 				return ec.fieldContext_Department_id(ctx, field)
 			case "name":
 				return ec.fieldContext_Department_name(ctx, field)
-			case "totalSalesWeekDept":
-				return ec.fieldContext_Department_totalSalesWeekDept(ctx, field)
+			case "totalSalesDept":
+				return ec.fieldContext_Department_totalSalesDept(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Department_createdAt(ctx, field)
 			case "updatedAt":
@@ -2532,8 +2532,8 @@ func (ec *executionContext) fieldContext_Mutation_updateDepartment(ctx context.C
 				return ec.fieldContext_Department_id(ctx, field)
 			case "name":
 				return ec.fieldContext_Department_name(ctx, field)
-			case "totalSalesWeekDept":
-				return ec.fieldContext_Department_totalSalesWeekDept(ctx, field)
+			case "totalSalesDept":
+				return ec.fieldContext_Department_totalSalesDept(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Department_createdAt(ctx, field)
 			case "updatedAt":
@@ -2844,8 +2844,8 @@ func (ec *executionContext) fieldContext_Query_getAllItems(ctx context.Context, 
 				return ec.fieldContext_Item_promotionPrice(ctx, field)
 			case "replenish":
 				return ec.fieldContext_Item_replenish(ctx, field)
-			case "totalSalesWeekItem":
-				return ec.fieldContext_Item_totalSalesWeekItem(ctx, field)
+			case "totalSalesItem":
+				return ec.fieldContext_Item_totalSalesItem(ctx, field)
 			case "aisle":
 				return ec.fieldContext_Item_aisle(ctx, field)
 			case "departmentId":
@@ -2913,8 +2913,8 @@ func (ec *executionContext) fieldContext_Query_getItemById(ctx context.Context, 
 				return ec.fieldContext_Item_promotionPrice(ctx, field)
 			case "replenish":
 				return ec.fieldContext_Item_replenish(ctx, field)
-			case "totalSalesWeekItem":
-				return ec.fieldContext_Item_totalSalesWeekItem(ctx, field)
+			case "totalSalesItem":
+				return ec.fieldContext_Item_totalSalesItem(ctx, field)
 			case "aisle":
 				return ec.fieldContext_Item_aisle(ctx, field)
 			case "departmentId":
@@ -2993,8 +2993,8 @@ func (ec *executionContext) fieldContext_Query_getTopItems(ctx context.Context, 
 				return ec.fieldContext_Item_promotionPrice(ctx, field)
 			case "replenish":
 				return ec.fieldContext_Item_replenish(ctx, field)
-			case "totalSalesWeekItem":
-				return ec.fieldContext_Item_totalSalesWeekItem(ctx, field)
+			case "totalSalesItem":
+				return ec.fieldContext_Item_totalSalesItem(ctx, field)
 			case "aisle":
 				return ec.fieldContext_Item_aisle(ctx, field)
 			case "departmentId":
@@ -3062,8 +3062,8 @@ func (ec *executionContext) fieldContext_Query_getItemsByCategory(ctx context.Co
 				return ec.fieldContext_Item_promotionPrice(ctx, field)
 			case "replenish":
 				return ec.fieldContext_Item_replenish(ctx, field)
-			case "totalSalesWeekItem":
-				return ec.fieldContext_Item_totalSalesWeekItem(ctx, field)
+			case "totalSalesItem":
+				return ec.fieldContext_Item_totalSalesItem(ctx, field)
 			case "aisle":
 				return ec.fieldContext_Item_aisle(ctx, field)
 			case "departmentId":
@@ -3130,8 +3130,8 @@ func (ec *executionContext) fieldContext_Query_getAllDepartments(ctx context.Con
 				return ec.fieldContext_Department_id(ctx, field)
 			case "name":
 				return ec.fieldContext_Department_name(ctx, field)
-			case "totalSalesWeekDept":
-				return ec.fieldContext_Department_totalSalesWeekDept(ctx, field)
+			case "totalSalesDept":
+				return ec.fieldContext_Department_totalSalesDept(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Department_createdAt(ctx, field)
 			case "updatedAt":
@@ -3183,8 +3183,8 @@ func (ec *executionContext) fieldContext_Query_getDepartmentById(ctx context.Con
 				return ec.fieldContext_Department_id(ctx, field)
 			case "name":
 				return ec.fieldContext_Department_name(ctx, field)
-			case "totalSalesWeekDept":
-				return ec.fieldContext_Department_totalSalesWeekDept(ctx, field)
+			case "totalSalesDept":
+				return ec.fieldContext_Department_totalSalesDept(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Department_createdAt(ctx, field)
 			case "updatedAt":
@@ -3247,8 +3247,8 @@ func (ec *executionContext) fieldContext_Query_getTopDepartments(ctx context.Con
 				return ec.fieldContext_Department_id(ctx, field)
 			case "name":
 				return ec.fieldContext_Department_name(ctx, field)
-			case "totalSalesWeekDept":
-				return ec.fieldContext_Department_totalSalesWeekDept(ctx, field)
+			case "totalSalesDept":
+				return ec.fieldContext_Department_totalSalesDept(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Department_createdAt(ctx, field)
 			case "updatedAt":
@@ -5440,7 +5440,7 @@ func (ec *executionContext) unmarshalInputUpdateDepartment(ctx context.Context, 
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "name", "totalSalesWeekDept"}
+	fieldsInOrder := [...]string{"id", "name", "totalSalesDept"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -5465,15 +5465,15 @@ func (ec *executionContext) unmarshalInputUpdateDepartment(ctx context.Context, 
 				return it, err
 			}
 			it.Name = data
-		case "totalSalesWeekDept":
+		case "totalSalesDept":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("totalSalesWeekDept"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("totalSalesDept"))
 			data, err := ec.unmarshalNFloat2float64(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.TotalSalesWeekDept = data
+			it.TotalSalesDept = data
 		}
 	}
 
@@ -5487,7 +5487,7 @@ func (ec *executionContext) unmarshalInputUpdateItem(ctx context.Context, obj in
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "name", "price", "qty", "category", "promotion", "promotionPrice", "replenish", "totalSalesWeekItem", "aisle", "departmentId"}
+	fieldsInOrder := [...]string{"id", "name", "price", "qty", "category", "promotion", "promotionPrice", "replenish", "totalSalesItem", "aisle", "departmentId"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -5566,15 +5566,15 @@ func (ec *executionContext) unmarshalInputUpdateItem(ctx context.Context, obj in
 				return it, err
 			}
 			it.Replenish = data
-		case "totalSalesWeekItem":
+		case "totalSalesItem":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("totalSalesWeekItem"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("totalSalesItem"))
 			data, err := ec.unmarshalNFloat2float64(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.TotalSalesWeekItem = data
+			it.TotalSalesItem = data
 		case "aisle":
 			var err error
 
@@ -5684,8 +5684,8 @@ func (ec *executionContext) _Department(ctx context.Context, sel ast.SelectionSe
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "totalSalesWeekDept":
-			out.Values[i] = ec._Department_totalSalesWeekDept(ctx, field, obj)
+		case "totalSalesDept":
+			out.Values[i] = ec._Department_totalSalesDept(ctx, field, obj)
 		case "createdAt":
 			out.Values[i] = ec._Department_createdAt(ctx, field, obj)
 		case "updatedAt":
@@ -5755,8 +5755,8 @@ func (ec *executionContext) _Item(ctx context.Context, sel ast.SelectionSet, obj
 			out.Values[i] = ec._Item_promotionPrice(ctx, field, obj)
 		case "replenish":
 			out.Values[i] = ec._Item_replenish(ctx, field, obj)
-		case "totalSalesWeekItem":
-			out.Values[i] = ec._Item_totalSalesWeekItem(ctx, field, obj)
+		case "totalSalesItem":
+			out.Values[i] = ec._Item_totalSalesItem(ctx, field, obj)
 		case "aisle":
 			out.Values[i] = ec._Item_aisle(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
