@@ -66,7 +66,7 @@ func (r *mutationResolver) ReturnItem(ctx context.Context, input *model.ItemTran
 		log.Fatal(err)
 	}
 
-	return &model.Item{ID: int(id)}, nil
+	return &model.Item{ID: int(id), QtySold: input.QtySold}, nil
 }
 
 // OrderItems is the resolver for the orderItems field.
@@ -77,12 +77,18 @@ func (r *mutationResolver) OrderItems(ctx context.Context, input *model.ItemOrde
 		log.Fatal(err)
 	}
 
-	return &model.Item{ID: int(id)}, nil
+	return &model.Item{ID: int(id), Qty: input.Qty}, nil
 }
 
 // SetSaleItem is the resolver for the setSaleItem field.
 func (r *mutationResolver) SetSaleItem(ctx context.Context, input *model.ItemPromotion) (*model.Item, error) {
-	panic(fmt.Errorf("not implemented: SetSaleItem - setSaleItem"))
+	var Item services.Item
+	id, err := Item.SetSaleItem(ctx, input)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return &model.Item{ID: int(id), Price: input.Price}, nil
 }
 
 // AddDepartment is the resolver for the addDepartment field.
@@ -184,7 +190,7 @@ func (r *queryResolver) GetItemByID(ctx context.Context, id *int) (*model.Item, 
 func (r *queryResolver) GetTopItems(ctx context.Context) ([]*model.Item, error) {
 	var Item services.Item
 	var resItems []*model.Item
-	dbItems, err := Item.GetAllItems(ctx)
+	dbItems, err := Item.GetTopItems(ctx)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -198,7 +204,18 @@ func (r *queryResolver) GetTopItems(ctx context.Context) ([]*model.Item, error) 
 
 // GetItemsByCategory is the resolver for the getItemsByCategory field.
 func (r *queryResolver) GetItemsByCategory(ctx context.Context, category *string) ([]*model.Item, error) {
-	panic(fmt.Errorf("not implemented: GetItemsByCategory - getItemsByCategory"))
+	var Item services.Item
+	var resItems []*model.Item
+	dbItems, err := Item.GetItemsByCategory(ctx, category)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for _, item := range dbItems {
+		resItems = append(resItems, &model.Item{ID: item.ID, Name: item.Name, Price: item.Price, Qty: item.Qty, Category: item.Category, Promotion: item.Promotion, TotalSalesItem: item.TotalSalesItem, Aisle: item.Aisle, DepartmentID: item.DepartmentID})
+	}
+
+	return resItems, nil
 }
 
 // GetAllDepartments is the resolver for the getAllDepartments field.
@@ -230,8 +247,18 @@ func (r *queryResolver) GetDepartmentByID(ctx context.Context, id *int) (*model.
 
 // GetTopDepartments is the resolver for the getTopDepartments field.
 func (r *queryResolver) GetTopDepartments(ctx context.Context) ([]*model.Department, error) {
-	panic(fmt.Errorf("not implemented: GetTopDepartments - getTopDepartments"))
-}
+	var Department services.Department
+	var resDepartments []*model.Department
+	dbDepartments, err := Department.GetTopDepartments(ctx)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for _, department := range dbDepartments {
+		resDepartments = append(resDepartments, &model.Department{ID: department.ID, Name: department.Name, TotalSalesDept: department.TotalSalesDept, CreatedAt: department.CreatedAt, UpdatedAt: department.UpdatedAt})
+	}
+
+	return resDepartments, nil}
 
 // GetAllManagers is the resolver for the getAllManagers field.
 func (r *queryResolver) GetAllManagers(ctx context.Context) ([]*model.Manager, error) {

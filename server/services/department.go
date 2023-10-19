@@ -111,3 +111,29 @@ func (d *Department) DeleteDepartment(ctx context.Context, id int64) (error) {
 
 	return nil
 }
+
+func (d *Department) GetTopDepartments(ctx context.Context) ([]*model.Department, error) {
+	stmt, err := config.DB.Prepare("SELECT * FROM Departments ORDER BY TotalSalesDept DESC")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	res, err := stmt.QueryContext(ctx)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer res.Close()
+
+	var departments []*model.Department
+
+	for res.Next() {
+		var department model.Department
+		err := res.Scan(&department.ID, &department.Name, &department.TotalSalesDept, &department.CreatedAt, &department.UpdatedAt)
+		if err != nil {
+			log.Fatal(err)
+		}
+		departments = append(departments, &department)
+	}
+
+	return departments, nil
+}

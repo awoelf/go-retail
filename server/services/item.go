@@ -203,3 +203,65 @@ func (i *Item) GetTopItems(ctx context.Context) ([]*model.Item, error) {
 
 	return items, nil
 }
+
+func (i *Item) GetItemsByCategory(ctx context.Context, category *string) ([]*model.Item, error) {
+	stmt, err := config.DB.Prepare("SELECT * FROM Items WHERE Category = ?")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	res, err := stmt.QueryContext(ctx, category)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer res.Close()
+
+	var items []*model.Item
+
+	for res.Next() {
+		var item model.Item
+		err := res.Scan(&item.ID, &item.Name, &item.Price, &item.Qty, &item.Category, &item.Promotion, &item.TotalSalesItem, &item.Aisle, &item.DepartmentID, &item.CreatedAt, &item.UpdatedAt)
+		if err != nil {
+			log.Fatal(err)
+		}
+		items = append(items, &item)
+	}
+
+	return items, nil
+}
+
+func (i *Item) SetSaleItem(ctx context.Context, input *model.ItemPromotion) (int64, error) {
+	stmt, err := config.DB.Prepare("UPDATE Items SET Price = ?, Promotion = true WHERE ID = ?")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	res, err := stmt.ExecContext(ctx, input)
+	if err != nil {
+		log.Fatal(err)
+	}
+	id, err := res.LastInsertId()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return id, nil
+}
+
+func (i *Item) ResetItem(ctx context.Context, input *model.ItemPromotion) (int64, error) {
+	stmt, err := config.DB.Prepare("UPDATE Items SET Price = ?, Promotion = false WHERE ID = ?")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	res, err := stmt.ExecContext(ctx, input)
+	if err != nil {
+		log.Fatal(err)
+	}
+	id, err := res.LastInsertId()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return id, nil
+}
