@@ -33,7 +33,7 @@ func (r *mutationResolver) UpdateItem(ctx context.Context, input *model.UpdateIt
 		log.Fatal(err)
 	}
 
-	return &model.Item{ID: int(id), Name: input.Name, Price: input.Price, Qty: input.Qty, Category: input.Category, Promotion: &input.Promotion, Replenish: &input.Replenish, TotalSalesItem: &input.TotalSalesItem, Aisle: input.Aisle}, nil
+	return &model.Item{ID: int(id), Name: input.Name, Price: input.Price, Qty: input.Qty, Category: input.Category, Promotion: &input.Promotion, TotalSalesItem: &input.TotalSalesItem, Aisle: input.Aisle}, nil
 }
 
 // DeleteItem is the resolver for the deleteItem field.
@@ -48,7 +48,7 @@ func (r *mutationResolver) DeleteItem(ctx context.Context, id *int) (*int, error
 }
 
 // SellItem is the resolver for the sellItem field.
-func (r *mutationResolver) SellItem(ctx context.Context, input *model.SellItem) (*model.Item, error) {
+func (r *mutationResolver) SellItem(ctx context.Context, input *model.ItemTransaction) (*model.Item, error) {
 	var Item services.Item
 	id, err := Item.SellItem(ctx, input)
 	if err != nil {
@@ -59,17 +59,29 @@ func (r *mutationResolver) SellItem(ctx context.Context, input *model.SellItem) 
 }
 
 // ReturnItem is the resolver for the returnItem field.
-func (r *mutationResolver) ReturnItem(ctx context.Context) (*model.Item, error) {
-	panic(fmt.Errorf("not implemented: ReturnItem - returnItem"))
+func (r *mutationResolver) ReturnItem(ctx context.Context, input *model.ItemTransaction) (*model.Item, error) {
+	var Item services.Item
+	id, err := Item.ReturnItem(ctx, input)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return &model.Item{ID: int(id)}, nil
 }
 
 // OrderItems is the resolver for the orderItems field.
-func (r *mutationResolver) OrderItems(ctx context.Context) ([]*model.Item, error) {
-	panic(fmt.Errorf("not implemented: OrderItems - orderItems"))
+func (r *mutationResolver) OrderItems(ctx context.Context, input *model.ItemOrder) (*model.Item, error) {
+	var Item services.Item
+	id, err := Item.OrderItems(ctx, input)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return &model.Item{ID: int(id)}, nil
 }
 
 // SetSaleItem is the resolver for the setSaleItem field.
-func (r *mutationResolver) SetSaleItem(ctx context.Context) (*model.Item, error) {
+func (r *mutationResolver) SetSaleItem(ctx context.Context, input *model.ItemPromotion) (*model.Item, error) {
 	panic(fmt.Errorf("not implemented: SetSaleItem - setSaleItem"))
 }
 
@@ -151,7 +163,7 @@ func (r *queryResolver) GetAllItems(ctx context.Context) ([]*model.Item, error) 
 	}
 
 	for _, item := range dbItems {
-		resItems = append(resItems, &model.Item{ID: item.ID, Name: item.Name, Price: item.Price, Qty: item.Qty, Category: item.Category, Promotion: item.Promotion, Replenish: item.Replenish, TotalSalesItem: item.TotalSalesItem, Aisle: item.Aisle, DepartmentID: item.DepartmentID})
+		resItems = append(resItems, &model.Item{ID: item.ID, Name: item.Name, Price: item.Price, Qty: item.Qty, Category: item.Category, Promotion: item.Promotion, TotalSalesItem: item.TotalSalesItem, Aisle: item.Aisle, DepartmentID: item.DepartmentID})
 	}
 
 	return resItems, nil
@@ -170,7 +182,18 @@ func (r *queryResolver) GetItemByID(ctx context.Context, id *int) (*model.Item, 
 
 // GetTopItems is the resolver for the getTopItems field.
 func (r *queryResolver) GetTopItems(ctx context.Context) ([]*model.Item, error) {
-	panic(fmt.Errorf("not implemented: GetTopItems - getTopItems"))
+	var Item services.Item
+	var resItems []*model.Item
+	dbItems, err := Item.GetAllItems(ctx)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for _, item := range dbItems {
+		resItems = append(resItems, &model.Item{ID: item.ID, Name: item.Name, Price: item.Price, Qty: item.Qty, Category: item.Category, Promotion: item.Promotion, TotalSalesItem: item.TotalSalesItem, Aisle: item.Aisle, DepartmentID: item.DepartmentID})
+	}
+
+	return resItems, nil
 }
 
 // GetItemsByCategory is the resolver for the getItemsByCategory field.

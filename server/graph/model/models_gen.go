@@ -15,6 +15,7 @@ type Item struct {
 	Name           string   `json:"name"`
 	Price          float64  `json:"price"`
 	Qty            int      `json:"qty"`
+	QtySold        int      `json:"qtySold"`
 	Category       string   `json:"category"`
 	Promotion      *bool    `json:"promotion,omitempty"`
 	Replenish      *bool    `json:"replenish,omitempty"`
@@ -23,6 +24,23 @@ type Item struct {
 	DepartmentID   int      `json:"departmentId"`
 	CreatedAt      *string  `json:"createdAt,omitempty"`
 	UpdatedAt      *string  `json:"updatedAt,omitempty"`
+}
+
+type ItemOrder struct {
+	ID  int `json:"id"`
+	Qty int `json:"qty"`
+}
+
+type ItemPromotion struct {
+	ID    int     `json:"id"`
+	Price float64 `json:"price"`
+}
+
+type ItemTransaction struct {
+	ID           int     `json:"id"`
+	QtySold      int     `json:"qtySold"`
+	Price        float64 `json:"price"`
+	DepartmentID int     `json:"departmentId"`
 }
 
 type Manager struct {
@@ -53,13 +71,6 @@ type NewManager struct {
 	DepartmentID int    `json:"departmentId"`
 }
 
-type SellItem struct {
-	ID           int     `json:"id"`
-	Qty          int     `json:"qty"`
-	Price        float64 `json:"price"`
-	DepartmentID int     `json:"departmentId"`
-}
-
 type UpdateDepartment struct {
 	ID             int     `json:"id"`
 	Name           string  `json:"name"`
@@ -73,7 +84,6 @@ type UpdateItem struct {
 	Qty            int     `json:"qty"`
 	Category       string  `json:"category"`
 	Promotion      bool    `json:"promotion"`
-	Replenish      bool    `json:"replenish"`
 	TotalSalesItem float64 `json:"totalSalesItem"`
 	Aisle          int     `json:"aisle"`
 	DepartmentID   int     `json:"departmentId"`

@@ -11,6 +11,6 @@ INSERT INTO Managers(FirstName, LastName, DepartmentID)
 		("Alexis", "Red", 1),
 		("John", "Blue", 2);
 
--- INSERT INTO Items(Name, Price, Qty, Category, AisleID)
--- 	VALUES
--- 		("apple", 1.99, 500, "fruit", 2);
+INSERT INTO Items(Name, Price, Qty, Category, DepartmentIDID)
+	VALUES
+		("apple", 1.99, 500, "fruit", 2);
