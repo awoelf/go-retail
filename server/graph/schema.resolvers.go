@@ -33,7 +33,7 @@ func (r *mutationResolver) UpdateItem(ctx context.Context, input *model.UpdateIt
 		log.Fatal(err)
 	}
 
-	return &model.Item{ID: int(id), Name: input.Name, Price: input.Price, Qty: input.Qty, Category: input.Category, Promotion: &input.Promotion, PromotionPrice: &input.PromotionPrice, Replenish: &input.Replenish, TotalSalesItem: &input.TotalSalesItem, Aisle: input.Aisle}, nil
+	return &model.Item{ID: int(id), Name: input.Name, Price: input.Price, Qty: input.Qty, Category: input.Category, Promotion: &input.Promotion, Replenish: &input.Replenish, TotalSalesItem: &input.TotalSalesItem, Aisle: input.Aisle}, nil
 }
 
 // DeleteItem is the resolver for the deleteItem field.
@@ -48,8 +48,14 @@ func (r *mutationResolver) DeleteItem(ctx context.Context, id *int) (*int, error
 }
 
 // SellItem is the resolver for the sellItem field.
-func (r *mutationResolver) SellItem(ctx context.Context) (*model.Item, error) {
-	panic(fmt.Errorf("not implemented: SellItem - sellItem"))
+func (r *mutationResolver) SellItem(ctx context.Context, input *model.SellItem) (*model.Item, error) {
+	var Item services.Item
+	id, err := Item.SellItem(ctx, input)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return &model.Item{ID: int(id)}, nil
 }
 
 // ReturnItem is the resolver for the returnItem field.
@@ -145,7 +151,7 @@ func (r *queryResolver) GetAllItems(ctx context.Context) ([]*model.Item, error) 
 	}
 
 	for _, item := range dbItems {
-		resItems = append(resItems, &model.Item{ID: item.ID, Name: item.Name, Price: item.Price, Qty: item.Qty, Category: item.Category, Promotion: item.Promotion, PromotionPrice: item.PromotionPrice, Replenish: item.Replenish, TotalSalesItem: item.TotalSalesItem, Aisle: item.Aisle, DepartmentID: item.DepartmentID})
+		resItems = append(resItems, &model.Item{ID: item.ID, Name: item.Name, Price: item.Price, Qty: item.Qty, Category: item.Category, Promotion: item.Promotion, Replenish: item.Replenish, TotalSalesItem: item.TotalSalesItem, Aisle: item.Aisle, DepartmentID: item.DepartmentID})
 	}
 
 	return resItems, nil

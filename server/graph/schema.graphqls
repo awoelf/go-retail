@@ -11,7 +11,6 @@ type Item {
 	qty: Int!
 	category: String!
 	promotion: Boolean
-	promotionPrice: Float
 	replenish: Boolean
 	totalSalesItem: Float
 	aisle: Int!
@@ -55,10 +54,16 @@ input UpdateItem {
 	qty: Int!
 	category: String!
 	promotion: Boolean!
-	promotionPrice: Float!
 	replenish: Boolean!
 	totalSalesItem: Float!
 	aisle: Int!
+	departmentId: Int!
+}
+
+input SellItem {
+	id: Int!
+	qty: Int!
+	price: Float!
 	departmentId: Int!
 }
 
@@ -101,7 +106,7 @@ type Mutation {
 	addItem(input: NewItem): Item
 	updateItem(input: UpdateItem): Item
 	deleteItem(id: Int): Int
-	sellItem: Item
+	sellItem(input: SellItem): Item
 	returnItem: Item
 	orderItems: [Item]
 	setSaleItem: Item

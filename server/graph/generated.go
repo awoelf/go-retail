@@ -64,7 +64,6 @@ type ComplexityRoot struct {
 		Name           func(childComplexity int) int
 		Price          func(childComplexity int) int
 		Promotion      func(childComplexity int) int
-		PromotionPrice func(childComplexity int) int
 		Qty            func(childComplexity int) int
 		Replenish      func(childComplexity int) int
 		TotalSalesItem func(childComplexity int) int
@@ -89,7 +88,7 @@ type ComplexityRoot struct {
 		DeleteManager    func(childComplexity int, id *int) int
 		OrderItems       func(childComplexity int) int
 		ReturnItem       func(childComplexity int) int
-		SellItem         func(childComplexity int) int
+		SellItem         func(childComplexity int, input *model.SellItem) int
 		SetSaleItem      func(childComplexity int) int
 		UpdateDepartment func(childComplexity int, input *model.UpdateDepartment) int
 		UpdateItem       func(childComplexity int, input *model.UpdateItem) int
@@ -113,7 +112,7 @@ type MutationResolver interface {
 	AddItem(ctx context.Context, input *model.NewItem) (*model.Item, error)
 	UpdateItem(ctx context.Context, input *model.UpdateItem) (*model.Item, error)
 	DeleteItem(ctx context.Context, id *int) (*int, error)
-	SellItem(ctx context.Context) (*model.Item, error)
+	SellItem(ctx context.Context, input *model.SellItem) (*model.Item, error)
 	ReturnItem(ctx context.Context) (*model.Item, error)
 	OrderItems(ctx context.Context) ([]*model.Item, error)
 	SetSaleItem(ctx context.Context) (*model.Item, error)
@@ -245,13 +244,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Item.Promotion(childComplexity), true
-
-	case "Item.promotionPrice":
-		if e.complexity.Item.PromotionPrice == nil {
-			break
-		}
-
-		return e.complexity.Item.PromotionPrice(childComplexity), true
 
 	case "Item.qty":
 		if e.complexity.Item.Qty == nil {
@@ -414,7 +406,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		return e.complexity.Mutation.SellItem(childComplexity), true
+		args, err := ec.field_Mutation_sellItem_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.SellItem(childComplexity, args["input"].(*model.SellItem)), true
 
 	case "Mutation.setSaleItem":
 		if e.complexity.Mutation.SetSaleItem == nil {
@@ -553,6 +550,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputNewDepartment,
 		ec.unmarshalInputNewItem,
 		ec.unmarshalInputNewManager,
+		ec.unmarshalInputSellItem,
 		ec.unmarshalInputUpdateDepartment,
 		ec.unmarshalInputUpdateItem,
 		ec.unmarshalInputUpdateManager,
@@ -759,6 +757,21 @@ func (ec *executionContext) field_Mutation_deleteManager_args(ctx context.Contex
 		}
 	}
 	args["id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_sellItem_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.SellItem
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalOSellItem2ᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋserverᚋgraphᚋmodelᚐSellItem(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
 	return args, nil
 }
 
@@ -1392,47 +1405,6 @@ func (ec *executionContext) fieldContext_Item_promotion(ctx context.Context, fie
 	return fc, nil
 }
 
-func (ec *executionContext) _Item_promotionPrice(ctx context.Context, field graphql.CollectedField, obj *model.Item) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Item_promotionPrice(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.PromotionPrice, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*float64)
-	fc.Result = res
-	return ec.marshalOFloat2ᚖfloat64(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Item_promotionPrice(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Item",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Float does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _Item_replenish(ctx context.Context, field graphql.CollectedField, obj *model.Item) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Item_replenish(ctx, field)
 	if err != nil {
@@ -1988,8 +1960,6 @@ func (ec *executionContext) fieldContext_Mutation_addItem(ctx context.Context, f
 				return ec.fieldContext_Item_category(ctx, field)
 			case "promotion":
 				return ec.fieldContext_Item_promotion(ctx, field)
-			case "promotionPrice":
-				return ec.fieldContext_Item_promotionPrice(ctx, field)
 			case "replenish":
 				return ec.fieldContext_Item_replenish(ctx, field)
 			case "totalSalesItem":
@@ -2068,8 +2038,6 @@ func (ec *executionContext) fieldContext_Mutation_updateItem(ctx context.Context
 				return ec.fieldContext_Item_category(ctx, field)
 			case "promotion":
 				return ec.fieldContext_Item_promotion(ctx, field)
-			case "promotionPrice":
-				return ec.fieldContext_Item_promotionPrice(ctx, field)
 			case "replenish":
 				return ec.fieldContext_Item_replenish(ctx, field)
 			case "totalSalesItem":
@@ -2166,7 +2134,7 @@ func (ec *executionContext) _Mutation_sellItem(ctx context.Context, field graphq
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().SellItem(rctx)
+		return ec.resolvers.Mutation().SellItem(rctx, fc.Args["input"].(*model.SellItem))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2200,8 +2168,6 @@ func (ec *executionContext) fieldContext_Mutation_sellItem(ctx context.Context, 
 				return ec.fieldContext_Item_category(ctx, field)
 			case "promotion":
 				return ec.fieldContext_Item_promotion(ctx, field)
-			case "promotionPrice":
-				return ec.fieldContext_Item_promotionPrice(ctx, field)
 			case "replenish":
 				return ec.fieldContext_Item_replenish(ctx, field)
 			case "totalSalesItem":
@@ -2217,6 +2183,17 @@ func (ec *executionContext) fieldContext_Mutation_sellItem(ctx context.Context, 
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Item", field.Name)
 		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_sellItem_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
 	}
 	return fc, nil
 }
@@ -2269,8 +2246,6 @@ func (ec *executionContext) fieldContext_Mutation_returnItem(ctx context.Context
 				return ec.fieldContext_Item_category(ctx, field)
 			case "promotion":
 				return ec.fieldContext_Item_promotion(ctx, field)
-			case "promotionPrice":
-				return ec.fieldContext_Item_promotionPrice(ctx, field)
 			case "replenish":
 				return ec.fieldContext_Item_replenish(ctx, field)
 			case "totalSalesItem":
@@ -2338,8 +2313,6 @@ func (ec *executionContext) fieldContext_Mutation_orderItems(ctx context.Context
 				return ec.fieldContext_Item_category(ctx, field)
 			case "promotion":
 				return ec.fieldContext_Item_promotion(ctx, field)
-			case "promotionPrice":
-				return ec.fieldContext_Item_promotionPrice(ctx, field)
 			case "replenish":
 				return ec.fieldContext_Item_replenish(ctx, field)
 			case "totalSalesItem":
@@ -2407,8 +2380,6 @@ func (ec *executionContext) fieldContext_Mutation_setSaleItem(ctx context.Contex
 				return ec.fieldContext_Item_category(ctx, field)
 			case "promotion":
 				return ec.fieldContext_Item_promotion(ctx, field)
-			case "promotionPrice":
-				return ec.fieldContext_Item_promotionPrice(ctx, field)
 			case "replenish":
 				return ec.fieldContext_Item_replenish(ctx, field)
 			case "totalSalesItem":
@@ -2840,8 +2811,6 @@ func (ec *executionContext) fieldContext_Query_getAllItems(ctx context.Context, 
 				return ec.fieldContext_Item_category(ctx, field)
 			case "promotion":
 				return ec.fieldContext_Item_promotion(ctx, field)
-			case "promotionPrice":
-				return ec.fieldContext_Item_promotionPrice(ctx, field)
 			case "replenish":
 				return ec.fieldContext_Item_replenish(ctx, field)
 			case "totalSalesItem":
@@ -2909,8 +2878,6 @@ func (ec *executionContext) fieldContext_Query_getItemById(ctx context.Context, 
 				return ec.fieldContext_Item_category(ctx, field)
 			case "promotion":
 				return ec.fieldContext_Item_promotion(ctx, field)
-			case "promotionPrice":
-				return ec.fieldContext_Item_promotionPrice(ctx, field)
 			case "replenish":
 				return ec.fieldContext_Item_replenish(ctx, field)
 			case "totalSalesItem":
@@ -2989,8 +2956,6 @@ func (ec *executionContext) fieldContext_Query_getTopItems(ctx context.Context, 
 				return ec.fieldContext_Item_category(ctx, field)
 			case "promotion":
 				return ec.fieldContext_Item_promotion(ctx, field)
-			case "promotionPrice":
-				return ec.fieldContext_Item_promotionPrice(ctx, field)
 			case "replenish":
 				return ec.fieldContext_Item_replenish(ctx, field)
 			case "totalSalesItem":
@@ -3058,8 +3023,6 @@ func (ec *executionContext) fieldContext_Query_getItemsByCategory(ctx context.Co
 				return ec.fieldContext_Item_category(ctx, field)
 			case "promotion":
 				return ec.fieldContext_Item_promotion(ctx, field)
-			case "promotionPrice":
-				return ec.fieldContext_Item_promotionPrice(ctx, field)
 			case "replenish":
 				return ec.fieldContext_Item_replenish(ctx, field)
 			case "totalSalesItem":
@@ -5433,6 +5396,62 @@ func (ec *executionContext) unmarshalInputNewManager(ctx context.Context, obj in
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputSellItem(ctx context.Context, obj interface{}) (model.SellItem, error) {
+	var it model.SellItem
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"id", "qty", "price", "departmentId"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			data, err := ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ID = data
+		case "qty":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("qty"))
+			data, err := ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Qty = data
+		case "price":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("price"))
+			data, err := ec.unmarshalNFloat2float64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Price = data
+		case "departmentId":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("departmentId"))
+			data, err := ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.DepartmentID = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputUpdateDepartment(ctx context.Context, obj interface{}) (model.UpdateDepartment, error) {
 	var it model.UpdateDepartment
 	asMap := map[string]interface{}{}
@@ -5487,7 +5506,7 @@ func (ec *executionContext) unmarshalInputUpdateItem(ctx context.Context, obj in
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "name", "price", "qty", "category", "promotion", "promotionPrice", "replenish", "totalSalesItem", "aisle", "departmentId"}
+	fieldsInOrder := [...]string{"id", "name", "price", "qty", "category", "promotion", "replenish", "totalSalesItem", "aisle", "departmentId"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -5548,15 +5567,6 @@ func (ec *executionContext) unmarshalInputUpdateItem(ctx context.Context, obj in
 				return it, err
 			}
 			it.Promotion = data
-		case "promotionPrice":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("promotionPrice"))
-			data, err := ec.unmarshalNFloat2float64(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.PromotionPrice = data
 		case "replenish":
 			var err error
 
@@ -5751,8 +5761,6 @@ func (ec *executionContext) _Item(ctx context.Context, sel ast.SelectionSet, obj
 			}
 		case "promotion":
 			out.Values[i] = ec._Item_promotion(ctx, field, obj)
-		case "promotionPrice":
-			out.Values[i] = ec._Item_promotionPrice(ctx, field, obj)
 		case "replenish":
 			out.Values[i] = ec._Item_replenish(ctx, field, obj)
 		case "totalSalesItem":
@@ -7026,6 +7034,14 @@ func (ec *executionContext) unmarshalONewManager2ᚖgithubᚗcomᚋawoelfᚋgo�
 		return nil, nil
 	}
 	res, err := ec.unmarshalInputNewManager(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOSellItem2ᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋserverᚋgraphᚋmodelᚐSellItem(ctx context.Context, v interface{}) (*model.SellItem, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputSellItem(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 

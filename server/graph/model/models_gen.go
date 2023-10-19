@@ -17,7 +17,6 @@ type Item struct {
 	Qty            int      `json:"qty"`
 	Category       string   `json:"category"`
 	Promotion      *bool    `json:"promotion,omitempty"`
-	PromotionPrice *float64 `json:"promotionPrice,omitempty"`
 	Replenish      *bool    `json:"replenish,omitempty"`
 	TotalSalesItem *float64 `json:"totalSalesItem,omitempty"`
 	Aisle          int      `json:"aisle"`
@@ -54,6 +53,13 @@ type NewManager struct {
 	DepartmentID int    `json:"departmentId"`
 }
 
+type SellItem struct {
+	ID           int     `json:"id"`
+	Qty          int     `json:"qty"`
+	Price        float64 `json:"price"`
+	DepartmentID int     `json:"departmentId"`
+}
+
 type UpdateDepartment struct {
 	ID             int     `json:"id"`
 	Name           string  `json:"name"`
@@ -67,7 +73,6 @@ type UpdateItem struct {
 	Qty            int     `json:"qty"`
 	Category       string  `json:"category"`
 	Promotion      bool    `json:"promotion"`
-	PromotionPrice float64 `json:"promotionPrice"`
 	Replenish      bool    `json:"replenish"`
 	TotalSalesItem float64 `json:"totalSalesItem"`
 	Aisle          int     `json:"aisle"`
