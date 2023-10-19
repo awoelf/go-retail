@@ -8,8 +8,8 @@ GoRetail is a MySql back end written in Go to help users manage their retail sto
 - Go
 - Docker MySQL Container
 - GraphQL
-- [gqlgen](github.com/99designs/gqlgen)
-- [Go MySql](github.com/go-sql-driver/mysql)
+- [gqlgen](https://github.com/99designs/gqlgen)
+- [Go MySql](https://github.com/go-sql-driver/mysql)
 
 ## Features
 - CRUD functionality for all models
