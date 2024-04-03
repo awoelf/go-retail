@@ -30,7 +30,7 @@ Alexis Woelffer
 <a href='mailto:awoelf@outlook.com'>
 <img src='https://res.cloudinary.com/awoelf/image/upload/v1695011363/mail-button.svg' width='30'/>
 </a>
-<a href='https://linkedin.com/in/alexis-w-dev'>
+<a href='https://linkedin.com/in/awoelf'>
 <img src='https://res.cloudinary.com/awoelf/image/upload/v1695011364/linkedin-button.svg' width='30'/>
 </a>
 <a href='https://github.com/awoelf'>
