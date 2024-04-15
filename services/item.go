@@ -4,8 +4,8 @@ import (
 	"context"
 	"log"
 
-	"github.com/awoelf/go-retail/server/config"
-	"github.com/awoelf/go-retail/server/graph/model"
+	"github.com/awoelf/go-retail/config"
+	"github.com/awoelf/go-retail/graph/model"
 )
 
 type Item struct{ model.Item }

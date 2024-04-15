@@ -1,44 +1,34 @@
 include .env
 
 init_graph:
-	cd server; \
 	go run github.com/99designs/gqlgen init; \
 
 generate_graph:
-	cd server; \
 	go run github.com/99designs/gqlgen generate; \
 
 create_migrations:
-	cd server; \
 	sqlx migrate add -r init; \
 
 migrate_up:
-	sqlx migrate run --source ./server/migrations --database-url ${DB_URL}
+	sqlx migrate run --source ./migrations --database-url ${DB_URL}
 
 migrate_down:
-	sqlx migrate revert --source ./server/migrations --database-url ${DB_URL}
+	sqlx migrate revert --source ./migrations --database-url ${DB_URL}
 
-stop_containers:
-	@echo "Stopping other docker containers"; \
-	if [ $$(docker ps -q) ]; then \
-		echo "Found and stopped containers"; \
-		docker stop $$(docker ps -q); \
-	else \
-		echo "No containers running"; \
-	fi
+docker_create:
+	docker run -d --name ${DB_CONTAINER_NAME} -p ${DB_PORT}:${DB_PORT} -e POSTGRES_USER=${DB_USER} -e POSTGRES_PASSWORD=${DB_PASSWORD} postgres:16.2
 
-create_container:
-	docker run --name ${DB_DOCKER_CONTAINER} -v ${PWD}/mysql/init.sql:/docker-entrypoint-initdb.d/0_init.sql -e MYSQL_ROOT_PASSWORD=${MYSQL_PASSWORD} -p 3306:3306 -d mysql:8.1.0
+docker_delete: docker_stop
+	docker rm ${DB_CONTAINER_NAME}
 
-run_container:
-	docker start ${DB_DOCKER_CONTAINER}
+docker_run:
+	docker start ${DB_CONTAINER_NAME}
 
-delete_container: stop_containers
-	@echo "Deleting ${DB_DOCKER_CONTAINER}"; \
-	docker rm ${DB_DOCKER_CONTAINER}; \
+docker_stop:
+	docker stop ${DB_CONTAINER_NAME}
 
-mysql:
-	docker run -it mysql bash -c 'mysql -h ${HOST} -u ${MYSQL_USER} -p"${MYSQL_PASSWORD}"'
+create_db:
+	docker exec -it ${DB_CONTAINER_NAME} createdb --username=${DB_USER} --owner=${DB_USER} ${DB_NAME}
 
 build:
 	if [ -f "${BINARY}" ]; then \
@@ -46,7 +36,7 @@ build:
 		echo "Deleted ${BINARY}"; \
 	fi
 	@echo "Building binary"; \
-	go build -o ${BINARY} server/server.go; \
+	go build -o ${BINARY} server.go; \
 
 run: build
 	./${BINARY}
@@ -56,3 +46,6 @@ stop:
 	@echo "Stopping server"; \
 	@-pkill -SIGTERM -f "./${BINARY}"; \
 	@echo "Server stopped"; \
+
+# Code for initializing a container with a .sql file.
+# -v ${PWD}/mysql/init.sql:/docker-entrypoint-initdb.d/0_init.sql

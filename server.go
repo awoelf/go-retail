@@ -7,8 +7,8 @@ import (
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
-	"github.com/awoelf/go-retail/server/config"
-	"github.com/awoelf/go-retail/server/graph"
+	"github.com/awoelf/go-retail/config"
+	"github.com/awoelf/go-retail/graph"
 	"github.com/joho/godotenv"
 )
 

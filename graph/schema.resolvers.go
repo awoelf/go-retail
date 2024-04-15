@@ -9,8 +9,8 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/awoelf/go-retail/server/graph/model"
-	"github.com/awoelf/go-retail/server/services"
+	"github.com/awoelf/go-retail/graph/model"
+	"github.com/awoelf/go-retail/services"
 )
 
 // AddItem is the resolver for the addItem field.
