@@ -45,7 +45,7 @@ func (i *Item) GetAllItems(ctx context.Context) ([]*model.Item, error) {
 
 	for res.Next() {
 		var item model.Item
-		err := res.Scan(&item.ID, &item.Name, &item.Price, &item.Qty, &item.Category, &item.Promotion, &item.TotalSalesItem, &item.Aisle, &item.DepartmentID, &item.CreatedAt, &item.UpdatedAt)
+		err := res.Scan(&item.ID, &item.Name, &item.Price, &item.Qty, &item.Category, &item.Promo, &item.PromoPrice, &item.TotalSalesItem, &item.Aisle, &item.DepartmentID, &item.CreatedAt, &item.UpdatedAt)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -67,7 +67,7 @@ func (i *Item) GetItemById(ctx context.Context, id int64) (*model.Item, error) {
 	var item model.Item
 
 	for res.Next() {
-		err = res.Scan(&item.ID, &item.Name, &item.Price, &item.Qty, &item.Category, &item.Promotion, &item.TotalSalesItem, &item.Aisle, &item.DepartmentID, &item.CreatedAt, &item.UpdatedAt)
+		err = res.Scan(&item.ID, &item.Name, &item.Price, &item.Qty, &item.Category, &item.Promo, &item.PromoPrice, &item.TotalSalesItem, &item.Aisle, &item.DepartmentID, &item.CreatedAt, &item.UpdatedAt)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -82,7 +82,7 @@ func (i *Item) UpdateItem(ctx context.Context, input *model.UpdateItem) (int64, 
 		log.Fatal(err)
 	}
 
-	res, err := stmt.ExecContext(ctx, input.Name, input.Price, input.Qty, input.Category, input.Promotion, input.TotalSalesItem, input.Aisle, input.DepartmentID, input.ID)
+	res, err := stmt.ExecContext(ctx, input.Name, input.Price, input.Qty, input.Category, input.Promo, input.PromoPrice, input.TotalSalesItem, input.Aisle, input.DepartmentID, input.ID)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -110,8 +110,6 @@ func (i *Item) DeleteItem(ctx context.Context, id int64) error {
 }
 
 func (i *Item) SellItem(ctx context.Context, input *model.ItemTransaction) (int64, error) {
-	var totalSales = input.Price * float64(input.QtySold)
-
 	// Add sales to department total
 	stmtDept, err := config.DB.Prepare("UPDATE Departments SET TotalSalesDept = (TotalSalesDept + ?) WHERE ID = ?")
 	if err != nil {

@@ -63,10 +63,10 @@ type ComplexityRoot struct {
 		ID             func(childComplexity int) int
 		Name           func(childComplexity int) int
 		Price          func(childComplexity int) int
-		Promotion      func(childComplexity int) int
+		Promo          func(childComplexity int) int
+		PromoPrice     func(childComplexity int) int
 		Qty            func(childComplexity int) int
 		QtySold        func(childComplexity int) int
-		Replenish      func(childComplexity int) int
 		TotalSalesItem func(childComplexity int) int
 		UpdatedAt      func(childComplexity int) int
 	}
@@ -84,9 +84,9 @@ type ComplexityRoot struct {
 		AddDepartment    func(childComplexity int, input *model.NewDepartment) int
 		AddItem          func(childComplexity int, input *model.NewItem) int
 		AddManager       func(childComplexity int, input *model.NewManager) int
-		DeleteDepartment func(childComplexity int, id *int) int
-		DeleteItem       func(childComplexity int, id *int) int
-		DeleteManager    func(childComplexity int, id *int) int
+		DeleteDepartment func(childComplexity int, id *string) int
+		DeleteItem       func(childComplexity int, id *string) int
+		DeleteManager    func(childComplexity int, id *string) int
 		OrderItems       func(childComplexity int, input *model.ItemOrder) int
 		ReturnItem       func(childComplexity int, input *model.ItemTransaction) int
 		SellItem         func(childComplexity int, input *model.ItemTransaction) int
@@ -100,10 +100,10 @@ type ComplexityRoot struct {
 		GetAllDepartments  func(childComplexity int) int
 		GetAllItems        func(childComplexity int) int
 		GetAllManagers     func(childComplexity int) int
-		GetDepartmentByID  func(childComplexity int, id *int) int
-		GetItemByID        func(childComplexity int, id *int) int
+		GetDepartmentByID  func(childComplexity int, id *string) int
+		GetItemByID        func(childComplexity int, id *string) int
 		GetItemsByCategory func(childComplexity int, category *string) int
-		GetManagerByID     func(childComplexity int, id *int) int
+		GetManagerByID     func(childComplexity int, id *string) int
 		GetTopDepartments  func(childComplexity int) int
 		GetTopItems        func(childComplexity int) int
 	}
@@ -112,28 +112,28 @@ type ComplexityRoot struct {
 type MutationResolver interface {
 	AddItem(ctx context.Context, input *model.NewItem) (*model.Item, error)
 	UpdateItem(ctx context.Context, input *model.UpdateItem) (*model.Item, error)
-	DeleteItem(ctx context.Context, id *int) (*int, error)
+	DeleteItem(ctx context.Context, id *string) (*string, error)
 	SellItem(ctx context.Context, input *model.ItemTransaction) (*model.Item, error)
 	ReturnItem(ctx context.Context, input *model.ItemTransaction) (*model.Item, error)
 	OrderItems(ctx context.Context, input *model.ItemOrder) (*model.Item, error)
 	SetSaleItem(ctx context.Context, input *model.ItemPromotion) (*model.Item, error)
 	AddDepartment(ctx context.Context, input *model.NewDepartment) (*model.Department, error)
 	UpdateDepartment(ctx context.Context, input *model.UpdateDepartment) (*model.Department, error)
-	DeleteDepartment(ctx context.Context, id *int) (*int, error)
+	DeleteDepartment(ctx context.Context, id *string) (*string, error)
 	AddManager(ctx context.Context, input *model.NewManager) (*model.Manager, error)
 	UpdateManager(ctx context.Context, input *model.UpdateManager) (*model.Manager, error)
-	DeleteManager(ctx context.Context, id *int) (*int, error)
+	DeleteManager(ctx context.Context, id *string) (*string, error)
 }
 type QueryResolver interface {
 	GetAllItems(ctx context.Context) ([]*model.Item, error)
-	GetItemByID(ctx context.Context, id *int) (*model.Item, error)
+	GetItemByID(ctx context.Context, id *string) (*model.Item, error)
 	GetTopItems(ctx context.Context) ([]*model.Item, error)
 	GetItemsByCategory(ctx context.Context, category *string) ([]*model.Item, error)
 	GetAllDepartments(ctx context.Context) ([]*model.Department, error)
-	GetDepartmentByID(ctx context.Context, id *int) (*model.Department, error)
+	GetDepartmentByID(ctx context.Context, id *string) (*model.Department, error)
 	GetTopDepartments(ctx context.Context) ([]*model.Department, error)
 	GetAllManagers(ctx context.Context) ([]*model.Manager, error)
-	GetManagerByID(ctx context.Context, id *int) (*model.Manager, error)
+	GetManagerByID(ctx context.Context, id *string) (*model.Manager, error)
 }
 
 type executableSchema struct {
@@ -239,12 +239,19 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Item.Price(childComplexity), true
 
-	case "Item.promotion":
-		if e.complexity.Item.Promotion == nil {
+	case "Item.promo":
+		if e.complexity.Item.Promo == nil {
 			break
 		}
 
-		return e.complexity.Item.Promotion(childComplexity), true
+		return e.complexity.Item.Promo(childComplexity), true
+
+	case "Item.promoPrice":
+		if e.complexity.Item.PromoPrice == nil {
+			break
+		}
+
+		return e.complexity.Item.PromoPrice(childComplexity), true
 
 	case "Item.qty":
 		if e.complexity.Item.Qty == nil {
@@ -259,13 +266,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Item.QtySold(childComplexity), true
-
-	case "Item.replenish":
-		if e.complexity.Item.Replenish == nil {
-			break
-		}
-
-		return e.complexity.Item.Replenish(childComplexity), true
 
 	case "Item.totalSalesItem":
 		if e.complexity.Item.TotalSalesItem == nil {
@@ -369,7 +369,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.DeleteDepartment(childComplexity, args["id"].(*int)), true
+		return e.complexity.Mutation.DeleteDepartment(childComplexity, args["id"].(*string)), true
 
 	case "Mutation.deleteItem":
 		if e.complexity.Mutation.DeleteItem == nil {
@@ -381,7 +381,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.DeleteItem(childComplexity, args["id"].(*int)), true
+		return e.complexity.Mutation.DeleteItem(childComplexity, args["id"].(*string)), true
 
 	case "Mutation.deleteManager":
 		if e.complexity.Mutation.DeleteManager == nil {
@@ -393,7 +393,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.DeleteManager(childComplexity, args["id"].(*int)), true
+		return e.complexity.Mutation.DeleteManager(childComplexity, args["id"].(*string)), true
 
 	case "Mutation.orderItems":
 		if e.complexity.Mutation.OrderItems == nil {
@@ -510,7 +510,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.GetDepartmentByID(childComplexity, args["id"].(*int)), true
+		return e.complexity.Query.GetDepartmentByID(childComplexity, args["id"].(*string)), true
 
 	case "Query.getItemById":
 		if e.complexity.Query.GetItemByID == nil {
@@ -522,7 +522,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.GetItemByID(childComplexity, args["id"].(*int)), true
+		return e.complexity.Query.GetItemByID(childComplexity, args["id"].(*string)), true
 
 	case "Query.getItemsByCategory":
 		if e.complexity.Query.GetItemsByCategory == nil {
@@ -546,7 +546,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.GetManagerByID(childComplexity, args["id"].(*int)), true
+		return e.complexity.Query.GetManagerByID(childComplexity, args["id"].(*string)), true
 
 	case "Query.getTopDepartments":
 		if e.complexity.Query.GetTopDepartments == nil {
@@ -701,7 +701,7 @@ func (ec *executionContext) field_Mutation_addDepartment_args(ctx context.Contex
 	var arg0 *model.NewDepartment
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalONewDepartment2ᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋserverᚋgraphᚋmodelᚐNewDepartment(ctx, tmp)
+		arg0, err = ec.unmarshalONewDepartment2ᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋgraphᚋmodelᚐNewDepartment(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -716,7 +716,7 @@ func (ec *executionContext) field_Mutation_addItem_args(ctx context.Context, raw
 	var arg0 *model.NewItem
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalONewItem2ᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋserverᚋgraphᚋmodelᚐNewItem(ctx, tmp)
+		arg0, err = ec.unmarshalONewItem2ᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋgraphᚋmodelᚐNewItem(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -731,7 +731,7 @@ func (ec *executionContext) field_Mutation_addManager_args(ctx context.Context, 
 	var arg0 *model.NewManager
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalONewManager2ᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋserverᚋgraphᚋmodelᚐNewManager(ctx, tmp)
+		arg0, err = ec.unmarshalONewManager2ᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋgraphᚋmodelᚐNewManager(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -743,10 +743,10 @@ func (ec *executionContext) field_Mutation_addManager_args(ctx context.Context, 
 func (ec *executionContext) field_Mutation_deleteDepartment_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 *int
+	var arg0 *string
 	if tmp, ok := rawArgs["id"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-		arg0, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		arg0, err = ec.unmarshalOID2ᚖstring(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -758,10 +758,10 @@ func (ec *executionContext) field_Mutation_deleteDepartment_args(ctx context.Con
 func (ec *executionContext) field_Mutation_deleteItem_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 *int
+	var arg0 *string
 	if tmp, ok := rawArgs["id"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-		arg0, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		arg0, err = ec.unmarshalOID2ᚖstring(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -773,10 +773,10 @@ func (ec *executionContext) field_Mutation_deleteItem_args(ctx context.Context, 
 func (ec *executionContext) field_Mutation_deleteManager_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 *int
+	var arg0 *string
 	if tmp, ok := rawArgs["id"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-		arg0, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		arg0, err = ec.unmarshalOID2ᚖstring(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -791,7 +791,7 @@ func (ec *executionContext) field_Mutation_orderItems_args(ctx context.Context, 
 	var arg0 *model.ItemOrder
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalOItemOrder2ᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋserverᚋgraphᚋmodelᚐItemOrder(ctx, tmp)
+		arg0, err = ec.unmarshalOItemOrder2ᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋgraphᚋmodelᚐItemOrder(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -806,7 +806,7 @@ func (ec *executionContext) field_Mutation_returnItem_args(ctx context.Context, 
 	var arg0 *model.ItemTransaction
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalOItemTransaction2ᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋserverᚋgraphᚋmodelᚐItemTransaction(ctx, tmp)
+		arg0, err = ec.unmarshalOItemTransaction2ᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋgraphᚋmodelᚐItemTransaction(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -821,7 +821,7 @@ func (ec *executionContext) field_Mutation_sellItem_args(ctx context.Context, ra
 	var arg0 *model.ItemTransaction
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalOItemTransaction2ᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋserverᚋgraphᚋmodelᚐItemTransaction(ctx, tmp)
+		arg0, err = ec.unmarshalOItemTransaction2ᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋgraphᚋmodelᚐItemTransaction(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -836,7 +836,7 @@ func (ec *executionContext) field_Mutation_setSaleItem_args(ctx context.Context,
 	var arg0 *model.ItemPromotion
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalOItemPromotion2ᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋserverᚋgraphᚋmodelᚐItemPromotion(ctx, tmp)
+		arg0, err = ec.unmarshalOItemPromotion2ᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋgraphᚋmodelᚐItemPromotion(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -851,7 +851,7 @@ func (ec *executionContext) field_Mutation_updateDepartment_args(ctx context.Con
 	var arg0 *model.UpdateDepartment
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalOUpdateDepartment2ᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋserverᚋgraphᚋmodelᚐUpdateDepartment(ctx, tmp)
+		arg0, err = ec.unmarshalOUpdateDepartment2ᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋgraphᚋmodelᚐUpdateDepartment(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -866,7 +866,7 @@ func (ec *executionContext) field_Mutation_updateItem_args(ctx context.Context, 
 	var arg0 *model.UpdateItem
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalOUpdateItem2ᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋserverᚋgraphᚋmodelᚐUpdateItem(ctx, tmp)
+		arg0, err = ec.unmarshalOUpdateItem2ᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋgraphᚋmodelᚐUpdateItem(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -881,7 +881,7 @@ func (ec *executionContext) field_Mutation_updateManager_args(ctx context.Contex
 	var arg0 *model.UpdateManager
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalOUpdateManager2ᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋserverᚋgraphᚋmodelᚐUpdateManager(ctx, tmp)
+		arg0, err = ec.unmarshalOUpdateManager2ᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋgraphᚋmodelᚐUpdateManager(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -908,10 +908,10 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 func (ec *executionContext) field_Query_getDepartmentById_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 *int
+	var arg0 *string
 	if tmp, ok := rawArgs["id"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-		arg0, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		arg0, err = ec.unmarshalOID2ᚖstring(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -923,10 +923,10 @@ func (ec *executionContext) field_Query_getDepartmentById_args(ctx context.Conte
 func (ec *executionContext) field_Query_getItemById_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 *int
+	var arg0 *string
 	if tmp, ok := rawArgs["id"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-		arg0, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		arg0, err = ec.unmarshalOID2ᚖstring(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -953,10 +953,10 @@ func (ec *executionContext) field_Query_getItemsByCategory_args(ctx context.Cont
 func (ec *executionContext) field_Query_getManagerById_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 *int
+	var arg0 *string
 	if tmp, ok := rawArgs["id"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-		arg0, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		arg0, err = ec.unmarshalOID2ᚖstring(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1029,9 +1029,9 @@ func (ec *executionContext) _Department_id(ctx context.Context, field graphql.Co
 		}
 		return graphql.Null
 	}
-	res := resTmp.(int)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
+	return ec.marshalNID2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Department_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1041,7 +1041,7 @@ func (ec *executionContext) fieldContext_Department_id(ctx context.Context, fiel
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
+			return nil, errors.New("field of type ID does not have child fields")
 		},
 	}
 	return fc, nil
@@ -1240,9 +1240,9 @@ func (ec *executionContext) _Item_id(ctx context.Context, field graphql.Collecte
 		}
 		return graphql.Null
 	}
-	res := resTmp.(int)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
+	return ec.marshalNID2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Item_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1252,7 +1252,51 @@ func (ec *executionContext) fieldContext_Item_id(ctx context.Context, field grap
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Item_departmentId(ctx context.Context, field graphql.CollectedField, obj *model.Item) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Item_departmentId(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DepartmentID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Item_departmentId(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Item",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
 		},
 	}
 	return fc, nil
@@ -1478,8 +1522,8 @@ func (ec *executionContext) fieldContext_Item_category(ctx context.Context, fiel
 	return fc, nil
 }
 
-func (ec *executionContext) _Item_promotion(ctx context.Context, field graphql.CollectedField, obj *model.Item) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Item_promotion(ctx, field)
+func (ec *executionContext) _Item_promo(ctx context.Context, field graphql.CollectedField, obj *model.Item) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Item_promo(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -1492,21 +1536,24 @@ func (ec *executionContext) _Item_promotion(ctx context.Context, field graphql.C
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Promotion, nil
+		return obj.Promo, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*bool)
+	res := resTmp.(bool)
 	fc.Result = res
-	return ec.marshalOBoolean2ᚖbool(ctx, field.Selections, res)
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Item_promotion(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Item_promo(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Item",
 		Field:      field,
@@ -1519,8 +1566,8 @@ func (ec *executionContext) fieldContext_Item_promotion(ctx context.Context, fie
 	return fc, nil
 }
 
-func (ec *executionContext) _Item_replenish(ctx context.Context, field graphql.CollectedField, obj *model.Item) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Item_replenish(ctx, field)
+func (ec *executionContext) _Item_promoPrice(ctx context.Context, field graphql.CollectedField, obj *model.Item) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Item_promoPrice(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -1533,28 +1580,31 @@ func (ec *executionContext) _Item_replenish(ctx context.Context, field graphql.C
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Replenish, nil
+		return obj.PromoPrice, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*bool)
+	res := resTmp.(float64)
 	fc.Result = res
-	return ec.marshalOBoolean2ᚖbool(ctx, field.Selections, res)
+	return ec.marshalNFloat2float64(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Item_replenish(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Item_promoPrice(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Item",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Boolean does not have child fields")
+			return nil, errors.New("field of type Float does not have child fields")
 		},
 	}
 	return fc, nil
@@ -1581,11 +1631,14 @@ func (ec *executionContext) _Item_totalSalesItem(ctx context.Context, field grap
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*float64)
+	res := resTmp.(float64)
 	fc.Result = res
-	return ec.marshalOFloat2ᚖfloat64(ctx, field.Selections, res)
+	return ec.marshalNFloat2float64(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Item_totalSalesItem(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1627,9 +1680,9 @@ func (ec *executionContext) _Item_aisle(ctx context.Context, field graphql.Colle
 		}
 		return graphql.Null
 	}
-	res := resTmp.(int)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Item_aisle(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1639,51 +1692,7 @@ func (ec *executionContext) fieldContext_Item_aisle(ctx context.Context, field g
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Item_departmentId(ctx context.Context, field graphql.CollectedField, obj *model.Item) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Item_departmentId(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.DepartmentID, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(int)
-	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Item_departmentId(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Item",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
+			return nil, errors.New("field of type String does not have child fields")
 		},
 	}
 	return fc, nil
@@ -1797,9 +1806,9 @@ func (ec *executionContext) _Manager_id(ctx context.Context, field graphql.Colle
 		}
 		return graphql.Null
 	}
-	res := resTmp.(int)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
+	return ec.marshalNID2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Manager_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1809,7 +1818,48 @@ func (ec *executionContext) fieldContext_Manager_id(ctx context.Context, field g
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Manager_departmentId(ctx context.Context, field graphql.CollectedField, obj *model.Manager) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Manager_departmentId(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DepartmentID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOID2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Manager_departmentId(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Manager",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
 		},
 	}
 	return fc, nil
@@ -1898,47 +1948,6 @@ func (ec *executionContext) fieldContext_Manager_lastName(ctx context.Context, f
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Manager_departmentId(ctx context.Context, field graphql.CollectedField, obj *model.Manager) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Manager_departmentId(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.DepartmentID, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*int)
-	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Manager_departmentId(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Manager",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
 		},
 	}
 	return fc, nil
@@ -2051,7 +2060,7 @@ func (ec *executionContext) _Mutation_addItem(ctx context.Context, field graphql
 	}
 	res := resTmp.(*model.Item)
 	fc.Result = res
-	return ec.marshalOItem2ᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋserverᚋgraphᚋmodelᚐItem(ctx, field.Selections, res)
+	return ec.marshalOItem2ᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋgraphᚋmodelᚐItem(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_addItem(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2064,6 +2073,8 @@ func (ec *executionContext) fieldContext_Mutation_addItem(ctx context.Context, f
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Item_id(ctx, field)
+			case "departmentId":
+				return ec.fieldContext_Item_departmentId(ctx, field)
 			case "name":
 				return ec.fieldContext_Item_name(ctx, field)
 			case "price":
@@ -2074,16 +2085,14 @@ func (ec *executionContext) fieldContext_Mutation_addItem(ctx context.Context, f
 				return ec.fieldContext_Item_qtySold(ctx, field)
 			case "category":
 				return ec.fieldContext_Item_category(ctx, field)
-			case "promotion":
-				return ec.fieldContext_Item_promotion(ctx, field)
-			case "replenish":
-				return ec.fieldContext_Item_replenish(ctx, field)
+			case "promo":
+				return ec.fieldContext_Item_promo(ctx, field)
+			case "promoPrice":
+				return ec.fieldContext_Item_promoPrice(ctx, field)
 			case "totalSalesItem":
 				return ec.fieldContext_Item_totalSalesItem(ctx, field)
 			case "aisle":
 				return ec.fieldContext_Item_aisle(ctx, field)
-			case "departmentId":
-				return ec.fieldContext_Item_departmentId(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Item_createdAt(ctx, field)
 			case "updatedAt":
@@ -2131,7 +2140,7 @@ func (ec *executionContext) _Mutation_updateItem(ctx context.Context, field grap
 	}
 	res := resTmp.(*model.Item)
 	fc.Result = res
-	return ec.marshalOItem2ᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋserverᚋgraphᚋmodelᚐItem(ctx, field.Selections, res)
+	return ec.marshalOItem2ᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋgraphᚋmodelᚐItem(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_updateItem(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2144,6 +2153,8 @@ func (ec *executionContext) fieldContext_Mutation_updateItem(ctx context.Context
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Item_id(ctx, field)
+			case "departmentId":
+				return ec.fieldContext_Item_departmentId(ctx, field)
 			case "name":
 				return ec.fieldContext_Item_name(ctx, field)
 			case "price":
@@ -2154,16 +2165,14 @@ func (ec *executionContext) fieldContext_Mutation_updateItem(ctx context.Context
 				return ec.fieldContext_Item_qtySold(ctx, field)
 			case "category":
 				return ec.fieldContext_Item_category(ctx, field)
-			case "promotion":
-				return ec.fieldContext_Item_promotion(ctx, field)
-			case "replenish":
-				return ec.fieldContext_Item_replenish(ctx, field)
+			case "promo":
+				return ec.fieldContext_Item_promo(ctx, field)
+			case "promoPrice":
+				return ec.fieldContext_Item_promoPrice(ctx, field)
 			case "totalSalesItem":
 				return ec.fieldContext_Item_totalSalesItem(ctx, field)
 			case "aisle":
 				return ec.fieldContext_Item_aisle(ctx, field)
-			case "departmentId":
-				return ec.fieldContext_Item_departmentId(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Item_createdAt(ctx, field)
 			case "updatedAt":
@@ -2200,7 +2209,7 @@ func (ec *executionContext) _Mutation_deleteItem(ctx context.Context, field grap
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().DeleteItem(rctx, fc.Args["id"].(*int))
+		return ec.resolvers.Mutation().DeleteItem(rctx, fc.Args["id"].(*string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2209,9 +2218,9 @@ func (ec *executionContext) _Mutation_deleteItem(ctx context.Context, field grap
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*int)
+	res := resTmp.(*string)
 	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+	return ec.marshalOID2ᚖstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_deleteItem(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2221,7 +2230,7 @@ func (ec *executionContext) fieldContext_Mutation_deleteItem(ctx context.Context
 		IsMethod:   true,
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
+			return nil, errors.New("field of type ID does not have child fields")
 		},
 	}
 	defer func() {
@@ -2263,7 +2272,7 @@ func (ec *executionContext) _Mutation_sellItem(ctx context.Context, field graphq
 	}
 	res := resTmp.(*model.Item)
 	fc.Result = res
-	return ec.marshalOItem2ᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋserverᚋgraphᚋmodelᚐItem(ctx, field.Selections, res)
+	return ec.marshalOItem2ᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋgraphᚋmodelᚐItem(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_sellItem(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2276,6 +2285,8 @@ func (ec *executionContext) fieldContext_Mutation_sellItem(ctx context.Context, 
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Item_id(ctx, field)
+			case "departmentId":
+				return ec.fieldContext_Item_departmentId(ctx, field)
 			case "name":
 				return ec.fieldContext_Item_name(ctx, field)
 			case "price":
@@ -2286,16 +2297,14 @@ func (ec *executionContext) fieldContext_Mutation_sellItem(ctx context.Context, 
 				return ec.fieldContext_Item_qtySold(ctx, field)
 			case "category":
 				return ec.fieldContext_Item_category(ctx, field)
-			case "promotion":
-				return ec.fieldContext_Item_promotion(ctx, field)
-			case "replenish":
-				return ec.fieldContext_Item_replenish(ctx, field)
+			case "promo":
+				return ec.fieldContext_Item_promo(ctx, field)
+			case "promoPrice":
+				return ec.fieldContext_Item_promoPrice(ctx, field)
 			case "totalSalesItem":
 				return ec.fieldContext_Item_totalSalesItem(ctx, field)
 			case "aisle":
 				return ec.fieldContext_Item_aisle(ctx, field)
-			case "departmentId":
-				return ec.fieldContext_Item_departmentId(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Item_createdAt(ctx, field)
 			case "updatedAt":
@@ -2343,7 +2352,7 @@ func (ec *executionContext) _Mutation_returnItem(ctx context.Context, field grap
 	}
 	res := resTmp.(*model.Item)
 	fc.Result = res
-	return ec.marshalOItem2ᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋserverᚋgraphᚋmodelᚐItem(ctx, field.Selections, res)
+	return ec.marshalOItem2ᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋgraphᚋmodelᚐItem(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_returnItem(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2356,6 +2365,8 @@ func (ec *executionContext) fieldContext_Mutation_returnItem(ctx context.Context
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Item_id(ctx, field)
+			case "departmentId":
+				return ec.fieldContext_Item_departmentId(ctx, field)
 			case "name":
 				return ec.fieldContext_Item_name(ctx, field)
 			case "price":
@@ -2366,16 +2377,14 @@ func (ec *executionContext) fieldContext_Mutation_returnItem(ctx context.Context
 				return ec.fieldContext_Item_qtySold(ctx, field)
 			case "category":
 				return ec.fieldContext_Item_category(ctx, field)
-			case "promotion":
-				return ec.fieldContext_Item_promotion(ctx, field)
-			case "replenish":
-				return ec.fieldContext_Item_replenish(ctx, field)
+			case "promo":
+				return ec.fieldContext_Item_promo(ctx, field)
+			case "promoPrice":
+				return ec.fieldContext_Item_promoPrice(ctx, field)
 			case "totalSalesItem":
 				return ec.fieldContext_Item_totalSalesItem(ctx, field)
 			case "aisle":
 				return ec.fieldContext_Item_aisle(ctx, field)
-			case "departmentId":
-				return ec.fieldContext_Item_departmentId(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Item_createdAt(ctx, field)
 			case "updatedAt":
@@ -2423,7 +2432,7 @@ func (ec *executionContext) _Mutation_orderItems(ctx context.Context, field grap
 	}
 	res := resTmp.(*model.Item)
 	fc.Result = res
-	return ec.marshalOItem2ᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋserverᚋgraphᚋmodelᚐItem(ctx, field.Selections, res)
+	return ec.marshalOItem2ᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋgraphᚋmodelᚐItem(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_orderItems(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2436,6 +2445,8 @@ func (ec *executionContext) fieldContext_Mutation_orderItems(ctx context.Context
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Item_id(ctx, field)
+			case "departmentId":
+				return ec.fieldContext_Item_departmentId(ctx, field)
 			case "name":
 				return ec.fieldContext_Item_name(ctx, field)
 			case "price":
@@ -2446,16 +2457,14 @@ func (ec *executionContext) fieldContext_Mutation_orderItems(ctx context.Context
 				return ec.fieldContext_Item_qtySold(ctx, field)
 			case "category":
 				return ec.fieldContext_Item_category(ctx, field)
-			case "promotion":
-				return ec.fieldContext_Item_promotion(ctx, field)
-			case "replenish":
-				return ec.fieldContext_Item_replenish(ctx, field)
+			case "promo":
+				return ec.fieldContext_Item_promo(ctx, field)
+			case "promoPrice":
+				return ec.fieldContext_Item_promoPrice(ctx, field)
 			case "totalSalesItem":
 				return ec.fieldContext_Item_totalSalesItem(ctx, field)
 			case "aisle":
 				return ec.fieldContext_Item_aisle(ctx, field)
-			case "departmentId":
-				return ec.fieldContext_Item_departmentId(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Item_createdAt(ctx, field)
 			case "updatedAt":
@@ -2503,7 +2512,7 @@ func (ec *executionContext) _Mutation_setSaleItem(ctx context.Context, field gra
 	}
 	res := resTmp.(*model.Item)
 	fc.Result = res
-	return ec.marshalOItem2ᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋserverᚋgraphᚋmodelᚐItem(ctx, field.Selections, res)
+	return ec.marshalOItem2ᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋgraphᚋmodelᚐItem(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_setSaleItem(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2516,6 +2525,8 @@ func (ec *executionContext) fieldContext_Mutation_setSaleItem(ctx context.Contex
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Item_id(ctx, field)
+			case "departmentId":
+				return ec.fieldContext_Item_departmentId(ctx, field)
 			case "name":
 				return ec.fieldContext_Item_name(ctx, field)
 			case "price":
@@ -2526,16 +2537,14 @@ func (ec *executionContext) fieldContext_Mutation_setSaleItem(ctx context.Contex
 				return ec.fieldContext_Item_qtySold(ctx, field)
 			case "category":
 				return ec.fieldContext_Item_category(ctx, field)
-			case "promotion":
-				return ec.fieldContext_Item_promotion(ctx, field)
-			case "replenish":
-				return ec.fieldContext_Item_replenish(ctx, field)
+			case "promo":
+				return ec.fieldContext_Item_promo(ctx, field)
+			case "promoPrice":
+				return ec.fieldContext_Item_promoPrice(ctx, field)
 			case "totalSalesItem":
 				return ec.fieldContext_Item_totalSalesItem(ctx, field)
 			case "aisle":
 				return ec.fieldContext_Item_aisle(ctx, field)
-			case "departmentId":
-				return ec.fieldContext_Item_departmentId(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Item_createdAt(ctx, field)
 			case "updatedAt":
@@ -2583,7 +2592,7 @@ func (ec *executionContext) _Mutation_addDepartment(ctx context.Context, field g
 	}
 	res := resTmp.(*model.Department)
 	fc.Result = res
-	return ec.marshalODepartment2ᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋserverᚋgraphᚋmodelᚐDepartment(ctx, field.Selections, res)
+	return ec.marshalODepartment2ᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋgraphᚋmodelᚐDepartment(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_addDepartment(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2647,7 +2656,7 @@ func (ec *executionContext) _Mutation_updateDepartment(ctx context.Context, fiel
 	}
 	res := resTmp.(*model.Department)
 	fc.Result = res
-	return ec.marshalODepartment2ᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋserverᚋgraphᚋmodelᚐDepartment(ctx, field.Selections, res)
+	return ec.marshalODepartment2ᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋgraphᚋmodelᚐDepartment(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_updateDepartment(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2700,7 +2709,7 @@ func (ec *executionContext) _Mutation_deleteDepartment(ctx context.Context, fiel
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().DeleteDepartment(rctx, fc.Args["id"].(*int))
+		return ec.resolvers.Mutation().DeleteDepartment(rctx, fc.Args["id"].(*string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2709,9 +2718,9 @@ func (ec *executionContext) _Mutation_deleteDepartment(ctx context.Context, fiel
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*int)
+	res := resTmp.(*string)
 	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+	return ec.marshalOID2ᚖstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_deleteDepartment(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2721,7 +2730,7 @@ func (ec *executionContext) fieldContext_Mutation_deleteDepartment(ctx context.C
 		IsMethod:   true,
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
+			return nil, errors.New("field of type ID does not have child fields")
 		},
 	}
 	defer func() {
@@ -2763,7 +2772,7 @@ func (ec *executionContext) _Mutation_addManager(ctx context.Context, field grap
 	}
 	res := resTmp.(*model.Manager)
 	fc.Result = res
-	return ec.marshalOManager2ᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋserverᚋgraphᚋmodelᚐManager(ctx, field.Selections, res)
+	return ec.marshalOManager2ᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋgraphᚋmodelᚐManager(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_addManager(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2776,12 +2785,12 @@ func (ec *executionContext) fieldContext_Mutation_addManager(ctx context.Context
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Manager_id(ctx, field)
+			case "departmentId":
+				return ec.fieldContext_Manager_departmentId(ctx, field)
 			case "firstName":
 				return ec.fieldContext_Manager_firstName(ctx, field)
 			case "lastName":
 				return ec.fieldContext_Manager_lastName(ctx, field)
-			case "departmentId":
-				return ec.fieldContext_Manager_departmentId(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Manager_createdAt(ctx, field)
 			case "updatedAt":
@@ -2829,7 +2838,7 @@ func (ec *executionContext) _Mutation_updateManager(ctx context.Context, field g
 	}
 	res := resTmp.(*model.Manager)
 	fc.Result = res
-	return ec.marshalOManager2ᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋserverᚋgraphᚋmodelᚐManager(ctx, field.Selections, res)
+	return ec.marshalOManager2ᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋgraphᚋmodelᚐManager(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_updateManager(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2842,12 +2851,12 @@ func (ec *executionContext) fieldContext_Mutation_updateManager(ctx context.Cont
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Manager_id(ctx, field)
+			case "departmentId":
+				return ec.fieldContext_Manager_departmentId(ctx, field)
 			case "firstName":
 				return ec.fieldContext_Manager_firstName(ctx, field)
 			case "lastName":
 				return ec.fieldContext_Manager_lastName(ctx, field)
-			case "departmentId":
-				return ec.fieldContext_Manager_departmentId(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Manager_createdAt(ctx, field)
 			case "updatedAt":
@@ -2884,7 +2893,7 @@ func (ec *executionContext) _Mutation_deleteManager(ctx context.Context, field g
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().DeleteManager(rctx, fc.Args["id"].(*int))
+		return ec.resolvers.Mutation().DeleteManager(rctx, fc.Args["id"].(*string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2893,9 +2902,9 @@ func (ec *executionContext) _Mutation_deleteManager(ctx context.Context, field g
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*int)
+	res := resTmp.(*string)
 	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+	return ec.marshalOID2ᚖstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_deleteManager(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2905,7 +2914,7 @@ func (ec *executionContext) fieldContext_Mutation_deleteManager(ctx context.Cont
 		IsMethod:   true,
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
+			return nil, errors.New("field of type ID does not have child fields")
 		},
 	}
 	defer func() {
@@ -2947,7 +2956,7 @@ func (ec *executionContext) _Query_getAllItems(ctx context.Context, field graphq
 	}
 	res := resTmp.([]*model.Item)
 	fc.Result = res
-	return ec.marshalOItem2ᚕᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋserverᚋgraphᚋmodelᚐItem(ctx, field.Selections, res)
+	return ec.marshalOItem2ᚕᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋgraphᚋmodelᚐItem(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_getAllItems(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2960,6 +2969,8 @@ func (ec *executionContext) fieldContext_Query_getAllItems(ctx context.Context, 
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Item_id(ctx, field)
+			case "departmentId":
+				return ec.fieldContext_Item_departmentId(ctx, field)
 			case "name":
 				return ec.fieldContext_Item_name(ctx, field)
 			case "price":
@@ -2970,16 +2981,14 @@ func (ec *executionContext) fieldContext_Query_getAllItems(ctx context.Context, 
 				return ec.fieldContext_Item_qtySold(ctx, field)
 			case "category":
 				return ec.fieldContext_Item_category(ctx, field)
-			case "promotion":
-				return ec.fieldContext_Item_promotion(ctx, field)
-			case "replenish":
-				return ec.fieldContext_Item_replenish(ctx, field)
+			case "promo":
+				return ec.fieldContext_Item_promo(ctx, field)
+			case "promoPrice":
+				return ec.fieldContext_Item_promoPrice(ctx, field)
 			case "totalSalesItem":
 				return ec.fieldContext_Item_totalSalesItem(ctx, field)
 			case "aisle":
 				return ec.fieldContext_Item_aisle(ctx, field)
-			case "departmentId":
-				return ec.fieldContext_Item_departmentId(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Item_createdAt(ctx, field)
 			case "updatedAt":
@@ -3005,7 +3014,7 @@ func (ec *executionContext) _Query_getItemById(ctx context.Context, field graphq
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().GetItemByID(rctx, fc.Args["id"].(*int))
+		return ec.resolvers.Query().GetItemByID(rctx, fc.Args["id"].(*string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3016,7 +3025,7 @@ func (ec *executionContext) _Query_getItemById(ctx context.Context, field graphq
 	}
 	res := resTmp.(*model.Item)
 	fc.Result = res
-	return ec.marshalOItem2ᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋserverᚋgraphᚋmodelᚐItem(ctx, field.Selections, res)
+	return ec.marshalOItem2ᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋgraphᚋmodelᚐItem(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_getItemById(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3029,6 +3038,8 @@ func (ec *executionContext) fieldContext_Query_getItemById(ctx context.Context, 
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Item_id(ctx, field)
+			case "departmentId":
+				return ec.fieldContext_Item_departmentId(ctx, field)
 			case "name":
 				return ec.fieldContext_Item_name(ctx, field)
 			case "price":
@@ -3039,16 +3050,14 @@ func (ec *executionContext) fieldContext_Query_getItemById(ctx context.Context, 
 				return ec.fieldContext_Item_qtySold(ctx, field)
 			case "category":
 				return ec.fieldContext_Item_category(ctx, field)
-			case "promotion":
-				return ec.fieldContext_Item_promotion(ctx, field)
-			case "replenish":
-				return ec.fieldContext_Item_replenish(ctx, field)
+			case "promo":
+				return ec.fieldContext_Item_promo(ctx, field)
+			case "promoPrice":
+				return ec.fieldContext_Item_promoPrice(ctx, field)
 			case "totalSalesItem":
 				return ec.fieldContext_Item_totalSalesItem(ctx, field)
 			case "aisle":
 				return ec.fieldContext_Item_aisle(ctx, field)
-			case "departmentId":
-				return ec.fieldContext_Item_departmentId(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Item_createdAt(ctx, field)
 			case "updatedAt":
@@ -3096,7 +3105,7 @@ func (ec *executionContext) _Query_getTopItems(ctx context.Context, field graphq
 	}
 	res := resTmp.([]*model.Item)
 	fc.Result = res
-	return ec.marshalOItem2ᚕᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋserverᚋgraphᚋmodelᚐItem(ctx, field.Selections, res)
+	return ec.marshalOItem2ᚕᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋgraphᚋmodelᚐItem(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_getTopItems(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3109,6 +3118,8 @@ func (ec *executionContext) fieldContext_Query_getTopItems(ctx context.Context, 
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Item_id(ctx, field)
+			case "departmentId":
+				return ec.fieldContext_Item_departmentId(ctx, field)
 			case "name":
 				return ec.fieldContext_Item_name(ctx, field)
 			case "price":
@@ -3119,16 +3130,14 @@ func (ec *executionContext) fieldContext_Query_getTopItems(ctx context.Context, 
 				return ec.fieldContext_Item_qtySold(ctx, field)
 			case "category":
 				return ec.fieldContext_Item_category(ctx, field)
-			case "promotion":
-				return ec.fieldContext_Item_promotion(ctx, field)
-			case "replenish":
-				return ec.fieldContext_Item_replenish(ctx, field)
+			case "promo":
+				return ec.fieldContext_Item_promo(ctx, field)
+			case "promoPrice":
+				return ec.fieldContext_Item_promoPrice(ctx, field)
 			case "totalSalesItem":
 				return ec.fieldContext_Item_totalSalesItem(ctx, field)
 			case "aisle":
 				return ec.fieldContext_Item_aisle(ctx, field)
-			case "departmentId":
-				return ec.fieldContext_Item_departmentId(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Item_createdAt(ctx, field)
 			case "updatedAt":
@@ -3165,7 +3174,7 @@ func (ec *executionContext) _Query_getItemsByCategory(ctx context.Context, field
 	}
 	res := resTmp.([]*model.Item)
 	fc.Result = res
-	return ec.marshalOItem2ᚕᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋserverᚋgraphᚋmodelᚐItem(ctx, field.Selections, res)
+	return ec.marshalOItem2ᚕᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋgraphᚋmodelᚐItem(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_getItemsByCategory(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3178,6 +3187,8 @@ func (ec *executionContext) fieldContext_Query_getItemsByCategory(ctx context.Co
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Item_id(ctx, field)
+			case "departmentId":
+				return ec.fieldContext_Item_departmentId(ctx, field)
 			case "name":
 				return ec.fieldContext_Item_name(ctx, field)
 			case "price":
@@ -3188,16 +3199,14 @@ func (ec *executionContext) fieldContext_Query_getItemsByCategory(ctx context.Co
 				return ec.fieldContext_Item_qtySold(ctx, field)
 			case "category":
 				return ec.fieldContext_Item_category(ctx, field)
-			case "promotion":
-				return ec.fieldContext_Item_promotion(ctx, field)
-			case "replenish":
-				return ec.fieldContext_Item_replenish(ctx, field)
+			case "promo":
+				return ec.fieldContext_Item_promo(ctx, field)
+			case "promoPrice":
+				return ec.fieldContext_Item_promoPrice(ctx, field)
 			case "totalSalesItem":
 				return ec.fieldContext_Item_totalSalesItem(ctx, field)
 			case "aisle":
 				return ec.fieldContext_Item_aisle(ctx, field)
-			case "departmentId":
-				return ec.fieldContext_Item_departmentId(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Item_createdAt(ctx, field)
 			case "updatedAt":
@@ -3245,7 +3254,7 @@ func (ec *executionContext) _Query_getAllDepartments(ctx context.Context, field 
 	}
 	res := resTmp.([]*model.Department)
 	fc.Result = res
-	return ec.marshalODepartment2ᚕᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋserverᚋgraphᚋmodelᚐDepartment(ctx, field.Selections, res)
+	return ec.marshalODepartment2ᚕᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋgraphᚋmodelᚐDepartment(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_getAllDepartments(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3287,7 +3296,7 @@ func (ec *executionContext) _Query_getDepartmentById(ctx context.Context, field 
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().GetDepartmentByID(rctx, fc.Args["id"].(*int))
+		return ec.resolvers.Query().GetDepartmentByID(rctx, fc.Args["id"].(*string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3298,7 +3307,7 @@ func (ec *executionContext) _Query_getDepartmentById(ctx context.Context, field 
 	}
 	res := resTmp.(*model.Department)
 	fc.Result = res
-	return ec.marshalODepartment2ᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋserverᚋgraphᚋmodelᚐDepartment(ctx, field.Selections, res)
+	return ec.marshalODepartment2ᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋgraphᚋmodelᚐDepartment(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_getDepartmentById(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3362,7 +3371,7 @@ func (ec *executionContext) _Query_getTopDepartments(ctx context.Context, field 
 	}
 	res := resTmp.([]*model.Department)
 	fc.Result = res
-	return ec.marshalODepartment2ᚕᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋserverᚋgraphᚋmodelᚐDepartment(ctx, field.Selections, res)
+	return ec.marshalODepartment2ᚕᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋgraphᚋmodelᚐDepartment(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_getTopDepartments(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3415,7 +3424,7 @@ func (ec *executionContext) _Query_getAllManagers(ctx context.Context, field gra
 	}
 	res := resTmp.([]*model.Manager)
 	fc.Result = res
-	return ec.marshalOManager2ᚕᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋserverᚋgraphᚋmodelᚐManager(ctx, field.Selections, res)
+	return ec.marshalOManager2ᚕᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋgraphᚋmodelᚐManager(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_getAllManagers(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3428,12 +3437,12 @@ func (ec *executionContext) fieldContext_Query_getAllManagers(ctx context.Contex
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Manager_id(ctx, field)
+			case "departmentId":
+				return ec.fieldContext_Manager_departmentId(ctx, field)
 			case "firstName":
 				return ec.fieldContext_Manager_firstName(ctx, field)
 			case "lastName":
 				return ec.fieldContext_Manager_lastName(ctx, field)
-			case "departmentId":
-				return ec.fieldContext_Manager_departmentId(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Manager_createdAt(ctx, field)
 			case "updatedAt":
@@ -3459,7 +3468,7 @@ func (ec *executionContext) _Query_getManagerById(ctx context.Context, field gra
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().GetManagerByID(rctx, fc.Args["id"].(*int))
+		return ec.resolvers.Query().GetManagerByID(rctx, fc.Args["id"].(*string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3470,7 +3479,7 @@ func (ec *executionContext) _Query_getManagerById(ctx context.Context, field gra
 	}
 	res := resTmp.(*model.Manager)
 	fc.Result = res
-	return ec.marshalOManager2ᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋserverᚋgraphᚋmodelᚐManager(ctx, field.Selections, res)
+	return ec.marshalOManager2ᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋgraphᚋmodelᚐManager(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_getManagerById(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3483,12 +3492,12 @@ func (ec *executionContext) fieldContext_Query_getManagerById(ctx context.Contex
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Manager_id(ctx, field)
+			case "departmentId":
+				return ec.fieldContext_Manager_departmentId(ctx, field)
 			case "firstName":
 				return ec.fieldContext_Manager_firstName(ctx, field)
 			case "lastName":
 				return ec.fieldContext_Manager_lastName(ctx, field)
-			case "departmentId":
-				return ec.fieldContext_Manager_departmentId(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Manager_createdAt(ctx, field)
 			case "updatedAt":
@@ -5428,17 +5437,13 @@ func (ec *executionContext) unmarshalInputItemOrder(ctx context.Context, obj int
 		}
 		switch k {
 		case "id":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-			data, err := ec.unmarshalNInt2int(ctx, v)
+			data, err := ec.unmarshalNID2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.ID = data
 		case "qty":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("qty"))
 			data, err := ec.unmarshalNInt2int(ctx, v)
 			if err != nil {
@@ -5458,7 +5463,7 @@ func (ec *executionContext) unmarshalInputItemPromotion(ctx context.Context, obj
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "price"}
+	fieldsInOrder := [...]string{"id", "promo", "promoPrice"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -5466,23 +5471,26 @@ func (ec *executionContext) unmarshalInputItemPromotion(ctx context.Context, obj
 		}
 		switch k {
 		case "id":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-			data, err := ec.unmarshalNInt2int(ctx, v)
+			data, err := ec.unmarshalNID2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.ID = data
-		case "price":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("price"))
+		case "promo":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("promo"))
+			data, err := ec.unmarshalNBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Promo = data
+		case "promoPrice":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("promoPrice"))
 			data, err := ec.unmarshalNFloat2float64(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.Price = data
+			it.PromoPrice = data
 		}
 	}
 
@@ -5496,7 +5504,7 @@ func (ec *executionContext) unmarshalInputItemTransaction(ctx context.Context, o
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "qtySold", "price", "departmentId"}
+	fieldsInOrder := [...]string{"id", "qtySold"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -5504,41 +5512,19 @@ func (ec *executionContext) unmarshalInputItemTransaction(ctx context.Context, o
 		}
 		switch k {
 		case "id":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-			data, err := ec.unmarshalNInt2int(ctx, v)
+			data, err := ec.unmarshalNID2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.ID = data
 		case "qtySold":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("qtySold"))
 			data, err := ec.unmarshalNInt2int(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.QtySold = data
-		case "price":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("price"))
-			data, err := ec.unmarshalNFloat2float64(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Price = data
-		case "departmentId":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("departmentId"))
-			data, err := ec.unmarshalNInt2int(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.DepartmentID = data
 		}
 	}
 
@@ -5560,8 +5546,6 @@ func (ec *executionContext) unmarshalInputNewDepartment(ctx context.Context, obj
 		}
 		switch k {
 		case "name":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
 			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
@@ -5581,16 +5565,21 @@ func (ec *executionContext) unmarshalInputNewItem(ctx context.Context, obj inter
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"name", "price", "qty", "category", "aisle", "departmentId"}
+	fieldsInOrder := [...]string{"departmentId", "name", "price", "qty", "category", "aisle"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
 			continue
 		}
 		switch k {
+		case "departmentId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("departmentId"))
+			data, err := ec.unmarshalNID2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.DepartmentID = data
 		case "name":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
 			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
@@ -5598,8 +5587,6 @@ func (ec *executionContext) unmarshalInputNewItem(ctx context.Context, obj inter
 			}
 			it.Name = data
 		case "price":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("price"))
 			data, err := ec.unmarshalNFloat2float64(ctx, v)
 			if err != nil {
@@ -5607,8 +5594,6 @@ func (ec *executionContext) unmarshalInputNewItem(ctx context.Context, obj inter
 			}
 			it.Price = data
 		case "qty":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("qty"))
 			data, err := ec.unmarshalNInt2int(ctx, v)
 			if err != nil {
@@ -5616,8 +5601,6 @@ func (ec *executionContext) unmarshalInputNewItem(ctx context.Context, obj inter
 			}
 			it.Qty = data
 		case "category":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("category"))
 			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
@@ -5625,23 +5608,12 @@ func (ec *executionContext) unmarshalInputNewItem(ctx context.Context, obj inter
 			}
 			it.Category = data
 		case "aisle":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("aisle"))
-			data, err := ec.unmarshalNInt2int(ctx, v)
+			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.Aisle = data
-		case "departmentId":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("departmentId"))
-			data, err := ec.unmarshalNInt2int(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.DepartmentID = data
 		}
 	}
 
@@ -5663,8 +5635,6 @@ func (ec *executionContext) unmarshalInputNewManager(ctx context.Context, obj in
 		}
 		switch k {
 		case "firstName":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("firstName"))
 			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
@@ -5672,8 +5642,6 @@ func (ec *executionContext) unmarshalInputNewManager(ctx context.Context, obj in
 			}
 			it.FirstName = data
 		case "lastName":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("lastName"))
 			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
@@ -5681,8 +5649,6 @@ func (ec *executionContext) unmarshalInputNewManager(ctx context.Context, obj in
 			}
 			it.LastName = data
 		case "departmentId":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("departmentId"))
 			data, err := ec.unmarshalNInt2int(ctx, v)
 			if err != nil {
@@ -5702,7 +5668,7 @@ func (ec *executionContext) unmarshalInputUpdateDepartment(ctx context.Context, 
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "name", "totalSalesDept"}
+	fieldsInOrder := [...]string{"id", "name"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -5710,8 +5676,6 @@ func (ec *executionContext) unmarshalInputUpdateDepartment(ctx context.Context, 
 		}
 		switch k {
 		case "id":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
 			data, err := ec.unmarshalNInt2int(ctx, v)
 			if err != nil {
@@ -5719,23 +5683,12 @@ func (ec *executionContext) unmarshalInputUpdateDepartment(ctx context.Context, 
 			}
 			it.ID = data
 		case "name":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
 			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.Name = data
-		case "totalSalesDept":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("totalSalesDept"))
-			data, err := ec.unmarshalNFloat2float64(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.TotalSalesDept = data
 		}
 	}
 
@@ -5749,7 +5702,7 @@ func (ec *executionContext) unmarshalInputUpdateItem(ctx context.Context, obj in
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "name", "price", "qty", "category", "promotion", "totalSalesItem", "aisle", "departmentId"}
+	fieldsInOrder := [...]string{"id", "departmentId", "name", "price", "qty", "qtySold", "category", "promo", "promoPrice", "totalSalesItem", "aisle"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -5757,86 +5710,82 @@ func (ec *executionContext) unmarshalInputUpdateItem(ctx context.Context, obj in
 		}
 		switch k {
 		case "id":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-			data, err := ec.unmarshalNInt2int(ctx, v)
+			data, err := ec.unmarshalNID2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.ID = data
+		case "departmentId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("departmentId"))
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.DepartmentID = data
 		case "name":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
-			data, err := ec.unmarshalNString2string(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.Name = data
 		case "price":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("price"))
-			data, err := ec.unmarshalNFloat2float64(ctx, v)
+			data, err := ec.unmarshalOFloat2ᚖfloat64(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.Price = data
 		case "qty":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("qty"))
-			data, err := ec.unmarshalNInt2int(ctx, v)
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.Qty = data
+		case "qtySold":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("qtySold"))
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.QtySold = data
 		case "category":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("category"))
-			data, err := ec.unmarshalNString2string(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.Category = data
-		case "promotion":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("promotion"))
-			data, err := ec.unmarshalNBoolean2bool(ctx, v)
+		case "promo":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("promo"))
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.Promotion = data
+			it.Promo = data
+		case "promoPrice":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("promoPrice"))
+			data, err := ec.unmarshalOFloat2ᚖfloat64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.PromoPrice = data
 		case "totalSalesItem":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("totalSalesItem"))
-			data, err := ec.unmarshalNFloat2float64(ctx, v)
+			data, err := ec.unmarshalOFloat2ᚖfloat64(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.TotalSalesItem = data
 		case "aisle":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("aisle"))
-			data, err := ec.unmarshalNInt2int(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.Aisle = data
-		case "departmentId":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("departmentId"))
-			data, err := ec.unmarshalNInt2int(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.DepartmentID = data
 		}
 	}
 
@@ -5858,17 +5807,13 @@ func (ec *executionContext) unmarshalInputUpdateManager(ctx context.Context, obj
 		}
 		switch k {
 		case "id":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-			data, err := ec.unmarshalNInt2int(ctx, v)
+			data, err := ec.unmarshalNID2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.ID = data
 		case "firstName":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("firstName"))
 			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
@@ -5876,8 +5821,6 @@ func (ec *executionContext) unmarshalInputUpdateManager(ctx context.Context, obj
 			}
 			it.FirstName = data
 		case "lastName":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("lastName"))
 			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
@@ -5885,8 +5828,6 @@ func (ec *executionContext) unmarshalInputUpdateManager(ctx context.Context, obj
 			}
 			it.LastName = data
 		case "departmentId":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("departmentId"))
 			data, err := ec.unmarshalNInt2int(ctx, v)
 			if err != nil {
@@ -5973,6 +5914,11 @@ func (ec *executionContext) _Item(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "departmentId":
+			out.Values[i] = ec._Item_departmentId(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		case "name":
 			out.Values[i] = ec._Item_name(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -5998,19 +5944,23 @@ func (ec *executionContext) _Item(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "promotion":
-			out.Values[i] = ec._Item_promotion(ctx, field, obj)
-		case "replenish":
-			out.Values[i] = ec._Item_replenish(ctx, field, obj)
-		case "totalSalesItem":
-			out.Values[i] = ec._Item_totalSalesItem(ctx, field, obj)
-		case "aisle":
-			out.Values[i] = ec._Item_aisle(ctx, field, obj)
+		case "promo":
+			out.Values[i] = ec._Item_promo(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "departmentId":
-			out.Values[i] = ec._Item_departmentId(ctx, field, obj)
+		case "promoPrice":
+			out.Values[i] = ec._Item_promoPrice(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "totalSalesItem":
+			out.Values[i] = ec._Item_totalSalesItem(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "aisle":
+			out.Values[i] = ec._Item_aisle(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -6057,6 +6007,8 @@ func (ec *executionContext) _Manager(ctx context.Context, sel ast.SelectionSet, 
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "departmentId":
+			out.Values[i] = ec._Manager_departmentId(ctx, field, obj)
 		case "firstName":
 			out.Values[i] = ec._Manager_firstName(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -6067,8 +6019,6 @@ func (ec *executionContext) _Manager(ctx context.Context, sel ast.SelectionSet, 
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "departmentId":
-			out.Values[i] = ec._Manager_departmentId(ctx, field, obj)
 		case "createdAt":
 			out.Values[i] = ec._Manager_createdAt(ctx, field, obj)
 		case "updatedAt":
@@ -6767,6 +6717,21 @@ func (ec *executionContext) marshalNFloat2float64(ctx context.Context, sel ast.S
 	return graphql.WrapContextMarshaler(ctx, res)
 }
 
+func (ec *executionContext) unmarshalNID2string(ctx context.Context, v interface{}) (string, error) {
+	res, err := graphql.UnmarshalID(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNID2string(ctx context.Context, sel ast.SelectionSet, v string) graphql.Marshaler {
+	res := graphql.MarshalID(v)
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+	}
+	return res
+}
+
 func (ec *executionContext) unmarshalNInt2int(ctx context.Context, v interface{}) (int, error) {
 	res, err := graphql.UnmarshalInt(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -7076,7 +7041,7 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	return res
 }
 
-func (ec *executionContext) marshalODepartment2ᚕᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋserverᚋgraphᚋmodelᚐDepartment(ctx context.Context, sel ast.SelectionSet, v []*model.Department) graphql.Marshaler {
+func (ec *executionContext) marshalODepartment2ᚕᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋgraphᚋmodelᚐDepartment(ctx context.Context, sel ast.SelectionSet, v []*model.Department) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -7103,7 +7068,7 @@ func (ec *executionContext) marshalODepartment2ᚕᚖgithubᚗcomᚋawoelfᚋgo�
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalODepartment2ᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋserverᚋgraphᚋmodelᚐDepartment(ctx, sel, v[i])
+			ret[i] = ec.marshalODepartment2ᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋgraphᚋmodelᚐDepartment(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -7117,7 +7082,7 @@ func (ec *executionContext) marshalODepartment2ᚕᚖgithubᚗcomᚋawoelfᚋgo�
 	return ret
 }
 
-func (ec *executionContext) marshalODepartment2ᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋserverᚋgraphᚋmodelᚐDepartment(ctx context.Context, sel ast.SelectionSet, v *model.Department) graphql.Marshaler {
+func (ec *executionContext) marshalODepartment2ᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋgraphᚋmodelᚐDepartment(ctx context.Context, sel ast.SelectionSet, v *model.Department) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -7140,6 +7105,22 @@ func (ec *executionContext) marshalOFloat2ᚖfloat64(ctx context.Context, sel as
 	return graphql.WrapContextMarshaler(ctx, res)
 }
 
+func (ec *executionContext) unmarshalOID2ᚖstring(ctx context.Context, v interface{}) (*string, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := graphql.UnmarshalID(v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOID2ᚖstring(ctx context.Context, sel ast.SelectionSet, v *string) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	res := graphql.MarshalID(*v)
+	return res
+}
+
 func (ec *executionContext) unmarshalOInt2ᚖint(ctx context.Context, v interface{}) (*int, error) {
 	if v == nil {
 		return nil, nil
@@ -7156,7 +7137,7 @@ func (ec *executionContext) marshalOInt2ᚖint(ctx context.Context, sel ast.Sele
 	return res
 }
 
-func (ec *executionContext) marshalOItem2ᚕᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋserverᚋgraphᚋmodelᚐItem(ctx context.Context, sel ast.SelectionSet, v []*model.Item) graphql.Marshaler {
+func (ec *executionContext) marshalOItem2ᚕᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋgraphᚋmodelᚐItem(ctx context.Context, sel ast.SelectionSet, v []*model.Item) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -7183,7 +7164,7 @@ func (ec *executionContext) marshalOItem2ᚕᚖgithubᚗcomᚋawoelfᚋgoᚑreta
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalOItem2ᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋserverᚋgraphᚋmodelᚐItem(ctx, sel, v[i])
+			ret[i] = ec.marshalOItem2ᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋgraphᚋmodelᚐItem(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -7197,14 +7178,14 @@ func (ec *executionContext) marshalOItem2ᚕᚖgithubᚗcomᚋawoelfᚋgoᚑreta
 	return ret
 }
 
-func (ec *executionContext) marshalOItem2ᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋserverᚋgraphᚋmodelᚐItem(ctx context.Context, sel ast.SelectionSet, v *model.Item) graphql.Marshaler {
+func (ec *executionContext) marshalOItem2ᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋgraphᚋmodelᚐItem(ctx context.Context, sel ast.SelectionSet, v *model.Item) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._Item(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalOItemOrder2ᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋserverᚋgraphᚋmodelᚐItemOrder(ctx context.Context, v interface{}) (*model.ItemOrder, error) {
+func (ec *executionContext) unmarshalOItemOrder2ᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋgraphᚋmodelᚐItemOrder(ctx context.Context, v interface{}) (*model.ItemOrder, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -7212,7 +7193,7 @@ func (ec *executionContext) unmarshalOItemOrder2ᚖgithubᚗcomᚋawoelfᚋgoᚑ
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalOItemPromotion2ᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋserverᚋgraphᚋmodelᚐItemPromotion(ctx context.Context, v interface{}) (*model.ItemPromotion, error) {
+func (ec *executionContext) unmarshalOItemPromotion2ᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋgraphᚋmodelᚐItemPromotion(ctx context.Context, v interface{}) (*model.ItemPromotion, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -7220,7 +7201,7 @@ func (ec *executionContext) unmarshalOItemPromotion2ᚖgithubᚗcomᚋawoelfᚋg
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalOItemTransaction2ᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋserverᚋgraphᚋmodelᚐItemTransaction(ctx context.Context, v interface{}) (*model.ItemTransaction, error) {
+func (ec *executionContext) unmarshalOItemTransaction2ᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋgraphᚋmodelᚐItemTransaction(ctx context.Context, v interface{}) (*model.ItemTransaction, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -7228,7 +7209,7 @@ func (ec *executionContext) unmarshalOItemTransaction2ᚖgithubᚗcomᚋawoelf�
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalOManager2ᚕᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋserverᚋgraphᚋmodelᚐManager(ctx context.Context, sel ast.SelectionSet, v []*model.Manager) graphql.Marshaler {
+func (ec *executionContext) marshalOManager2ᚕᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋgraphᚋmodelᚐManager(ctx context.Context, sel ast.SelectionSet, v []*model.Manager) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -7255,7 +7236,7 @@ func (ec *executionContext) marshalOManager2ᚕᚖgithubᚗcomᚋawoelfᚋgoᚑr
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalOManager2ᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋserverᚋgraphᚋmodelᚐManager(ctx, sel, v[i])
+			ret[i] = ec.marshalOManager2ᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋgraphᚋmodelᚐManager(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -7269,14 +7250,14 @@ func (ec *executionContext) marshalOManager2ᚕᚖgithubᚗcomᚋawoelfᚋgoᚑr
 	return ret
 }
 
-func (ec *executionContext) marshalOManager2ᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋserverᚋgraphᚋmodelᚐManager(ctx context.Context, sel ast.SelectionSet, v *model.Manager) graphql.Marshaler {
+func (ec *executionContext) marshalOManager2ᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋgraphᚋmodelᚐManager(ctx context.Context, sel ast.SelectionSet, v *model.Manager) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._Manager(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalONewDepartment2ᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋserverᚋgraphᚋmodelᚐNewDepartment(ctx context.Context, v interface{}) (*model.NewDepartment, error) {
+func (ec *executionContext) unmarshalONewDepartment2ᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋgraphᚋmodelᚐNewDepartment(ctx context.Context, v interface{}) (*model.NewDepartment, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -7284,7 +7265,7 @@ func (ec *executionContext) unmarshalONewDepartment2ᚖgithubᚗcomᚋawoelfᚋg
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalONewItem2ᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋserverᚋgraphᚋmodelᚐNewItem(ctx context.Context, v interface{}) (*model.NewItem, error) {
+func (ec *executionContext) unmarshalONewItem2ᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋgraphᚋmodelᚐNewItem(ctx context.Context, v interface{}) (*model.NewItem, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -7292,7 +7273,7 @@ func (ec *executionContext) unmarshalONewItem2ᚖgithubᚗcomᚋawoelfᚋgoᚑre
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalONewManager2ᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋserverᚋgraphᚋmodelᚐNewManager(ctx context.Context, v interface{}) (*model.NewManager, error) {
+func (ec *executionContext) unmarshalONewManager2ᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋgraphᚋmodelᚐNewManager(ctx context.Context, v interface{}) (*model.NewManager, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -7316,7 +7297,7 @@ func (ec *executionContext) marshalOString2ᚖstring(ctx context.Context, sel as
 	return res
 }
 
-func (ec *executionContext) unmarshalOUpdateDepartment2ᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋserverᚋgraphᚋmodelᚐUpdateDepartment(ctx context.Context, v interface{}) (*model.UpdateDepartment, error) {
+func (ec *executionContext) unmarshalOUpdateDepartment2ᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋgraphᚋmodelᚐUpdateDepartment(ctx context.Context, v interface{}) (*model.UpdateDepartment, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -7324,7 +7305,7 @@ func (ec *executionContext) unmarshalOUpdateDepartment2ᚖgithubᚗcomᚋawoelf�
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalOUpdateItem2ᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋserverᚋgraphᚋmodelᚐUpdateItem(ctx context.Context, v interface{}) (*model.UpdateItem, error) {
+func (ec *executionContext) unmarshalOUpdateItem2ᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋgraphᚋmodelᚐUpdateItem(ctx context.Context, v interface{}) (*model.UpdateItem, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -7332,7 +7313,7 @@ func (ec *executionContext) unmarshalOUpdateItem2ᚖgithubᚗcomᚋawoelfᚋgo�
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalOUpdateManager2ᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋserverᚋgraphᚋmodelᚐUpdateManager(ctx context.Context, v interface{}) (*model.UpdateManager, error) {
+func (ec *executionContext) unmarshalOUpdateManager2ᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋgraphᚋmodelᚐUpdateManager(ctx context.Context, v interface{}) (*model.UpdateManager, error) {
 	if v == nil {
 		return nil, nil
 	}

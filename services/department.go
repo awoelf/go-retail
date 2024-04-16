@@ -84,7 +84,7 @@ func (d *Department) UpdateDepartment(ctx context.Context, input *model.UpdateDe
 		log.Fatal(err)
 	}
 
-	res, err := stmt.ExecContext(ctx, input.Name, input.TotalSalesDept, input.ID)
+	res, err := stmt.ExecContext(ctx, input.Name, input.ID)
 	if err != nil {
 		log.Fatal(err)
 	}

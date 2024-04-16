@@ -4,77 +4,76 @@
 
 # User and store will be added later
 
-type Item {
-	id: Int!
-	name: String!
-	price: Float!
-	qty: Int!
-	qtySold: Int!
-	category: String!
-	promotion: Boolean
-	replenish: Boolean
-	totalSalesItem: Float
-	aisle: Int!
-	departmentId: Int! # FK
-	createdAt: String
-	updatedAt: String
-}
-
 type Department {
-	id: Int!
+	id: ID!
 	name: String!
 	totalSalesDept: Float
 	createdAt: String
 	updatedAt: String
 }
 
-# Later, I might implement an Employee model,
-# and the manager model will be an extension of it.
 type Manager {
-	id: Int!
+	id: ID!
+	departmentId: ID # FK
 	firstName: String!
 	lastName: String!
-	departmentId: Int # FK
+	createdAt: String
+	updatedAt: String
+}
+
+type Item {
+	id: ID!
+	departmentId: ID! # FK
+	name: String!
+	price: Float!
+	qty: Int!
+	qtySold: Int!
+	category: String!
+	promo: Boolean!
+	promoPrice: Float!
+	totalSalesItem: Float!
+	aisle: String!
 	createdAt: String
 	updatedAt: String
 }
 
 input NewItem {
+	departmentId: ID! # FK
 	name: String!
 	price: Float!
 	qty: Int!
 	category: String!
-	aisle: Int!
-	departmentId: Int! # FK
+	aisle: String!
 }
 
 input UpdateItem {
-	id: Int!
-	name: String!
-	price: Float!
-	qty: Int!
-	category: String!
-	promotion: Boolean!
-	totalSalesItem: Float!
-	aisle: Int!
-	departmentId: Int!
+	id: ID!
+	departmentId: ID
+	name: String
+	price: Float
+	qty: Int
+	qtySold: Int
+	category: String
+	promo: Boolean
+	promoPrice: Float
+	totalSalesItem: Float
+	aisle: String
 }
 
 input ItemTransaction {
-	id: Int!
+	id: ID!
 	qtySold: Int!
-	price: Float!
-	departmentId: Int!
 }
 
 input ItemOrder {
-	id: Int!
+	id: ID!
 	qty: Int!
 }
 
 input ItemPromotion {
-	id: Int!
-	price: Float!
+	id: ID!
+	promo: Boolean!
+	promoPrice: Float!
 }
 
 input NewDepartment {
@@ -84,7 +83,6 @@ input NewDepartment {
 input UpdateDepartment {
 	id: Int!
 	name: String!
-	totalSalesDept: Float!
 }
 
 input NewManager {
@@ -94,7 +92,7 @@ input NewManager {
 }
 
 input UpdateManager {
-	id: Int!
+	id: ID!
 	firstName: String!
 	lastName: String!
 	departmentId: Int!
@@ -102,28 +100,28 @@ input UpdateManager {
 
 type Query {
 	getAllItems: [Item]
-	getItemById(id: Int): Item
+	getItemById(id: ID): Item
 	getTopItems: [Item]
 	getItemsByCategory(category: String): [Item]
 	getAllDepartments: [Department]
-	getDepartmentById(id: Int): Department
+	getDepartmentById(id: ID): Department
 	getTopDepartments: [Department]
 	getAllManagers: [Manager]
-	getManagerById(id: Int): Manager
+	getManagerById(id: ID): Manager
 }
 
 type Mutation {
 	addItem(input: NewItem): Item
 	updateItem(input: UpdateItem): Item
-	deleteItem(id: Int): Int
+	deleteItem(id: ID): ID
 	sellItem(input: ItemTransaction): Item
 	returnItem(input: ItemTransaction): Item
 	orderItems(input: ItemOrder): Item
 	setSaleItem(input: ItemPromotion): Item
 	addDepartment(input: NewDepartment): Department
 	updateDepartment(input: UpdateDepartment): Department
-	deleteDepartment(id: Int): Int
+	deleteDepartment(id: ID): ID
 	addManager(input: NewManager): Manager
 	updateManager(input: UpdateManager): Manager
-	deleteManager(id: Int): Int
+	deleteManager(id: ID): ID
 }
