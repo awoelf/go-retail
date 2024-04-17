@@ -64,6 +64,10 @@ func (m *Manager) GetManagerById(ctx context.Context, id int64) (*model.Manager,
 	}
 
 	res, err := stmt.QueryContext(ctx, id)
+	if err != nil {
+		log.Fatal(err)
+	}
+	
 	defer res.Close()
 
 	var manager model.Manager

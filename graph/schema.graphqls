@@ -81,21 +81,21 @@ input NewDepartment {
 }
 
 input UpdateDepartment {
-	id: Int!
+	id: ID!
 	name: String!
 }
 
 input NewManager {
 	firstName: String!
 	lastName: String!
-	departmentId: Int!
+	departmentId: ID!
 }
 
 input UpdateManager {
 	id: ID!
 	firstName: String!
 	lastName: String!
-	departmentId: Int!
+	departmentId: ID!
 }
 
 type Query {

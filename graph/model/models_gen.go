@@ -70,14 +70,14 @@ type NewItem struct {
 type NewManager struct {
 	FirstName    string `json:"firstName"`
 	LastName     string `json:"lastName"`
-	DepartmentID int    `json:"departmentId"`
+	DepartmentID string `json:"departmentId"`
 }
 
 type Query struct {
 }
 
 type UpdateDepartment struct {
-	ID   int    `json:"id"`
+	ID   string `json:"id"`
 	Name string `json:"name"`
 }
 
@@ -99,5 +99,5 @@ type UpdateManager struct {
 	ID           string `json:"id"`
 	FirstName    string `json:"firstName"`
 	LastName     string `json:"lastName"`
-	DepartmentID int    `json:"departmentId"`
+	DepartmentID string `json:"departmentId"`
 }

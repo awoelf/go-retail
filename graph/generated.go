@@ -5650,7 +5650,7 @@ func (ec *executionContext) unmarshalInputNewManager(ctx context.Context, obj in
 			it.LastName = data
 		case "departmentId":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("departmentId"))
-			data, err := ec.unmarshalNInt2int(ctx, v)
+			data, err := ec.unmarshalNID2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -5677,7 +5677,7 @@ func (ec *executionContext) unmarshalInputUpdateDepartment(ctx context.Context, 
 		switch k {
 		case "id":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-			data, err := ec.unmarshalNInt2int(ctx, v)
+			data, err := ec.unmarshalNID2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -5829,7 +5829,7 @@ func (ec *executionContext) unmarshalInputUpdateManager(ctx context.Context, obj
 			it.LastName = data
 		case "departmentId":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("departmentId"))
-			data, err := ec.unmarshalNInt2int(ctx, v)
+			data, err := ec.unmarshalNID2string(ctx, v)
 			if err != nil {
 				return it, err
 			}

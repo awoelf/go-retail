@@ -22,7 +22,7 @@ func (r *mutationResolver) AddItem(ctx context.Context, input *model.NewItem) (*
 	}
 
 	fmt.Printf("res: %v\n", id)
-	return &model.Item{ID: int(id), Name: input.Name, Price: input.Price, Qty: input.Qty, Category: input.Category, Aisle: input.Aisle, DepartmentID: input.DepartmentID}, nil
+	return &model.Item{ID: id, Name: input.Name, Price: input.Price, Qty: input.Qty, Category: input.Category, Aisle: input.Aisle, DepartmentID: input.DepartmentID}, nil
 }
 
 // UpdateItem is the resolver for the updateItem field.
@@ -100,7 +100,7 @@ func (r *mutationResolver) AddDepartment(ctx context.Context, input *model.NewDe
 	}
 
 	fmt.Printf("res: %v\n", id)
-	return &model.Department{ID: int(id), Name: input.Name}, nil
+	return &model.Department{ID: id, Name: input.Name}, nil
 }
 
 // UpdateDepartment is the resolver for the updateDepartment field.

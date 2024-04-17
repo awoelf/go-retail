@@ -62,6 +62,10 @@ func (i *Item) GetItemById(ctx context.Context, id int64) (*model.Item, error) {
 	}
 
 	res, err := stmt.QueryContext(ctx, id)
+	if err != nil {
+		log.Fatal(err)
+	}
+	
 	defer res.Close()
 
 	var item model.Item
@@ -110,22 +114,27 @@ func (i *Item) DeleteItem(ctx context.Context, id int64) error {
 }
 
 func (i *Item) SellItem(ctx context.Context, input *model.ItemTransaction) (int64, error) {
-	// Add sales to department total
-	stmtDept, err := config.DB.Prepare("UPDATE Departments SET TotalSalesDept = (TotalSalesDept + ?) WHERE ID = ?")
+	// TODO: Add sales to department total
+
+	// stmtDept, err := config.DB.Prepare("UPDATE Departments SET TotalSalesDept = (TotalSalesDept + ?) WHERE ID = ?")
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+	// _, err = stmtDept.ExecContext(ctx, totalSales, input.DepartmentID)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+
+	// Add sales to item total and remove quantity from item
+	stmtItem, err := config.DB.Prepare("UPDATE Items SET Qty = (Qty - ?), QtySold = (QtySold + ?) WHERE ID = ?")
 	if err != nil {
 		log.Fatal(err)
 	}
-	_, err = stmtDept.ExecContext(ctx, totalSales, input.DepartmentID)
+	res, err := stmtItem.ExecContext(ctx, input.QtySold, input.QtySold, input.ID)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	// Add sales to item total and remove quantity from item
-	stmtItem, err := config.DB.Prepare("UPDATE Items SET Qty = (Qty - ?), QtySold = (QtySold + ?), TotalSalesItem = (TotalSalesItem + ?) WHERE ID = ?")
-	if err != nil {
-		log.Fatal(err)
-	}
-	res, err := stmtItem.ExecContext(ctx, input.QtySold, input.QtySold, totalSales, input.ID)
 	id, err := res.LastInsertId()
 	if err != nil {
 		log.Fatal(err)
@@ -135,24 +144,26 @@ func (i *Item) SellItem(ctx context.Context, input *model.ItemTransaction) (int6
 }
 
 func (i *Item) ReturnItem(ctx context.Context, input *model.ItemTransaction) (int64, error) {
-	var totalSales = input.Price * float64(input.QtySold)
-
-	// Remove sales from department total
-	stmtDept, err := config.DB.Prepare("UPDATE Departments SET TotalSalesDept = (TotalSalesDept - ?) WHERE ID = ?")
-	if err != nil {
-		log.Fatal(err)
-	}
-	_, err = stmtDept.ExecContext(ctx, totalSales, input.DepartmentID)
-	if err != nil {
-		log.Fatal(err)
-	}
+	// TODO: Remove sales from department total
+	// stmtDept, err := config.DB.Prepare("UPDATE Departments SET TotalSalesDept = (TotalSalesDept - ?) WHERE ID = ?")
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+	// _, err = stmtDept.ExecContext(ctx, totalSales, input.DepartmentID)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
 
 	// Remove sales from item total and add quantity to item
-	stmtItem, err := config.DB.Prepare("UPDATE Items SET Qty = (Qty + ?), QtySold = (QtySold - ?), TotalSalesItem = (TotalSalesItem - ?) WHERE ID = ?")
+	stmtItem, err := config.DB.Prepare("UPDATE Items SET Qty = (Qty + ?), QtySold = (QtySold - ?) WHERE ID = ?")
 	if err != nil {
 		log.Fatal(err)
 	}
-	res, err := stmtItem.ExecContext(ctx, input.QtySold, input.QtySold, totalSales, input.ID)
+	res, err := stmtItem.ExecContext(ctx, input.QtySold, input.QtySold, input.ID)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	id, err := res.LastInsertId()
 	if err != nil {
 		log.Fatal(err)
@@ -168,6 +179,10 @@ func (i *Item) OrderItems(ctx context.Context, input *model.ItemOrder) (int64, e
 	}
 
 	res, err := stmt.ExecContext(ctx, input.Qty, input.ID)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	id, err := res.LastInsertId()
 	if err != nil {
 		log.Fatal(err)
@@ -192,7 +207,7 @@ func (i *Item) GetTopItems(ctx context.Context) ([]*model.Item, error) {
 
 	for res.Next() {
 		var item model.Item
-		err := res.Scan(&item.ID, &item.Name, &item.Price, &item.Qty, &item.Category, &item.Promotion, &item.TotalSalesItem, &item.Aisle, &item.DepartmentID, &item.CreatedAt, &item.UpdatedAt)
+		err := res.Scan(&item.ID, &item.Name, &item.Price, &item.Qty, &item.Category, &item.Promo, &item.PromoPrice, &item.TotalSalesItem, &item.Aisle, &item.DepartmentID, &item.CreatedAt, &item.UpdatedAt)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -218,7 +233,7 @@ func (i *Item) GetItemsByCategory(ctx context.Context, category *string) ([]*mod
 
 	for res.Next() {
 		var item model.Item
-		err := res.Scan(&item.ID, &item.Name, &item.Price, &item.Qty, &item.Category, &item.Promotion, &item.TotalSalesItem, &item.Aisle, &item.DepartmentID, &item.CreatedAt, &item.UpdatedAt)
+		err := res.Scan(&item.ID, &item.Name, &item.Price, &item.Qty, &item.Category, &item.Promo, &item.PromoPrice, &item.TotalSalesItem, &item.Aisle, &item.DepartmentID, &item.CreatedAt, &item.UpdatedAt)
 		if err != nil {
 			log.Fatal(err)
 		}

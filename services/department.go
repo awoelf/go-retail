@@ -64,6 +64,10 @@ func (d *Department) GetDepartmentById(ctx context.Context, id int64) (*model.De
 	}
 
 	res, err := stmt.QueryContext(ctx, id)
+	if err != nil {
+		log.Fatal(err)
+	}
+	
 	defer res.Close()
 
 	var department model.Department
