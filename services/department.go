@@ -4,7 +4,6 @@ import (
 	"context"
 	"log"
 
-	"github.com/awoelf/go-retail/config"
 	"github.com/awoelf/go-retail/graph/model"
 )
 
@@ -13,7 +12,7 @@ type Department struct {
 }
 
 func (d *Department) AddDepartment(ctx context.Context, input *model.NewDepartment) (int64, error) {
-	stmt, err := config.DB.Prepare("INSERT INTO Departments(Name) VALUES(?)")
+	stmt, err := db.Prepare("INSERT INTO Departments(Name) VALUES(?)")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -32,7 +31,7 @@ func (d *Department) AddDepartment(ctx context.Context, input *model.NewDepartme
 }
 
 func (d *Department) GetAllDepartments(ctx context.Context) ([]*model.Department, error) {
-	stmt, err := config.DB.Prepare("SELECT * FROM Departments")
+	stmt, err := db.Prepare("SELECT * FROM Departments")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -58,7 +57,7 @@ func (d *Department) GetAllDepartments(ctx context.Context) ([]*model.Department
 }
 
 func (d *Department) GetDepartmentById(ctx context.Context, id int64) (*model.Department, error) {
-	stmt, err := config.DB.Prepare("SELECT * FROM Departments WHERE ID = ?")
+	stmt, err := db.Prepare("SELECT * FROM Departments WHERE ID = ?")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -83,7 +82,7 @@ func (d *Department) GetDepartmentById(ctx context.Context, id int64) (*model.De
 }
 
 func (d *Department) UpdateDepartment(ctx context.Context, input *model.UpdateDepartment) (int64, error) {
-	stmt, err := config.DB.Prepare("UPDATE Departments SET Name = ?, TotalSalesDept = ?, UpdatedAt = NOW() WHERE ID = ?")
+	stmt, err := db.Prepare("UPDATE Departments SET Name = ?, TotalSalesDept = ?, UpdatedAt = NOW() WHERE ID = ?")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -102,7 +101,7 @@ func (d *Department) UpdateDepartment(ctx context.Context, input *model.UpdateDe
 }
 
 func (d *Department) DeleteDepartment(ctx context.Context, id int64) (error) {
-	stmt, err := config.DB.Prepare("DELETE FROM Departments WHERE ID = ?")
+	stmt, err := db.Prepare("DELETE FROM Departments WHERE ID = ?")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -117,7 +116,7 @@ func (d *Department) DeleteDepartment(ctx context.Context, id int64) (error) {
 }
 
 func (d *Department) GetTopDepartments(ctx context.Context) ([]*model.Department, error) {
-	stmt, err := config.DB.Prepare("SELECT * FROM Departments ORDER BY TotalSalesDept DESC")
+	stmt, err := db.Prepare("SELECT * FROM Departments ORDER BY TotalSalesDept DESC")
 	if err != nil {
 		log.Fatal(err)
 	}

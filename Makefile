@@ -37,7 +37,7 @@ build:
 		echo "Deleted ${BINARY}"; \
 	fi
 	@echo "Building binary"; \
-	go build -o ${BINARY} server.go; \
+	go build -o ${BINARY} main.go; \
 
 run: build
 	./${BINARY}

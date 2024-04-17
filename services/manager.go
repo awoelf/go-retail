@@ -4,14 +4,13 @@ import (
 	"context"
 	"log"
 
-	"github.com/awoelf/go-retail/config"
 	"github.com/awoelf/go-retail/graph/model"
 )
 
 type Manager struct{}
 
 func (m *Manager) AddManager(ctx context.Context, input *model.NewManager) (int64, error) {
-	stmt, err := config.DB.Prepare("INSERT INTO Managers(FirstName, LastName, DepartmentID) VALUES(?,?,?)")
+	stmt, err := db.Prepare("INSERT INTO Managers(FirstName, LastName, DepartmentID) VALUES(?,?,?)")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -30,7 +29,7 @@ func (m *Manager) AddManager(ctx context.Context, input *model.NewManager) (int6
 }
 
 func (m *Manager) GetAllManagers(ctx context.Context) ([]*model.Manager, error) {
-	stmt, err := config.DB.Prepare("SELECT * FROM Managers")
+	stmt, err := db.Prepare("SELECT * FROM Managers")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -56,7 +55,7 @@ func (m *Manager) GetAllManagers(ctx context.Context) ([]*model.Manager, error) 
 }
 
 func (m *Manager) GetManagerById(ctx context.Context, id int64) (*model.Manager, error) {
-	stmt, err := config.DB.Prepare("SELECT * FROM Managers WHERE ID = ?")
+	stmt, err := db.Prepare("SELECT * FROM Managers WHERE ID = ?")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -81,7 +80,7 @@ func (m *Manager) GetManagerById(ctx context.Context, id int64) (*model.Manager,
 }
 
 func (m *Manager) UpdateManager(ctx context.Context, input *model.UpdateManager) (int64, error) {
-	stmt, err := config.DB.Prepare("UPDATE Managers SET FirstName = ?, LastName = ?, DepartmentID = ?, UpdatedAt = NOW() WHERE ID = ?")
+	stmt, err := db.Prepare("UPDATE Managers SET FirstName = ?, LastName = ?, DepartmentID = ?, UpdatedAt = NOW() WHERE ID = ?")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -100,7 +99,7 @@ func (m *Manager) UpdateManager(ctx context.Context, input *model.UpdateManager)
 }
 
 func (m *Manager) DeleteManager(ctx context.Context, id int64) (error) {
-	stmt, err := config.DB.Prepare("DELETE FROM Managers WHERE ID = ?")
+	stmt, err := db.Prepare("DELETE FROM Managers WHERE ID = ?")
 	if err != nil {
 		log.Fatal(err)
 	}
