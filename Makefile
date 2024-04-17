@@ -11,10 +11,10 @@ create_migrations:
 	sqlx migrate add -r init; \
 
 migrate_up:
-	sqlx migrate run --source ./migrations --database-url ${DB_URL}
+	sqlx migrate run --source ./db/migrations --database-url ${DB_URL}
 
 migrate_down:
-	sqlx migrate revert --source ./migrations --database-url ${DB_URL}
+	sqlx migrate revert --source ./db/migrations --database-url ${DB_URL}
 
 docker_create:
 	docker run -d --name ${DB_CONTAINER_NAME} -p ${DB_PORT}:${DB_PORT} -e POSTGRES_USER=${DB_USER} -e POSTGRES_PASSWORD=${DB_PASSWORD} postgres:16.2
