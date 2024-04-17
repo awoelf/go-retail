@@ -8,9 +8,7 @@ import (
 	"github.com/awoelf/go-retail/graph/model"
 )
 
-type Manager struct {
-	model.Manager
-}
+type Manager struct{}
 
 func (m *Manager) AddManager(ctx context.Context, input *model.NewManager) (int64, error) {
 	stmt, err := config.DB.Prepare("INSERT INTO Managers(FirstName, LastName, DepartmentID) VALUES(?,?,?)")

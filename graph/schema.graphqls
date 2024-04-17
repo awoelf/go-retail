@@ -2,14 +2,14 @@
 #
 # https://gqlgen.com/getting-started/
 
-# User and store will be added later
+# TODO: Add TRANSACTION, USER, STORE
 
 type Department {
 	id: ID!
 	name: String!
 	totalSalesDept: Float
-	createdAt: String
-	updatedAt: String
+	createdAt: String!
+	updatedAt: String!
 }
 
 type Manager {
@@ -17,8 +17,8 @@ type Manager {
 	departmentId: ID # FK
 	firstName: String!
 	lastName: String!
-	createdAt: String
-	updatedAt: String
+	createdAt: String!
+	updatedAt: String!
 }
 
 type Item {
@@ -33,8 +33,8 @@ type Item {
 	promoPrice: Float!
 	totalSalesItem: Float!
 	aisle: String!
-	createdAt: String
-	updatedAt: String
+	createdAt: String!
+	updatedAt: String!
 }
 
 input NewItem {
@@ -62,12 +62,12 @@ input UpdateItem {
 
 input ItemTransaction {
 	id: ID!
-	qtySold: Int!
+	qtyTransaction: Int!
 }
 
 input ItemOrder {
 	id: ID!
-	qty: Int!
+	qtyOrder: Int!
 }
 
 input ItemPromotion {
@@ -117,7 +117,8 @@ type Mutation {
 	sellItem(input: ItemTransaction): Item
 	returnItem(input: ItemTransaction): Item
 	orderItems(input: ItemOrder): Item
-	setSaleItem(input: ItemPromotion): Item
+	startSaleItem(input: ItemPromotion): Item
+	endSaleItem(input: ID): ID
 	addDepartment(input: NewDepartment): Department
 	updateDepartment(input: UpdateDepartment): Department
 	deleteDepartment(id: ID): ID

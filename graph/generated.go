@@ -87,10 +87,11 @@ type ComplexityRoot struct {
 		DeleteDepartment func(childComplexity int, id *string) int
 		DeleteItem       func(childComplexity int, id *string) int
 		DeleteManager    func(childComplexity int, id *string) int
+		EndSaleItem      func(childComplexity int, input *string) int
 		OrderItems       func(childComplexity int, input *model.ItemOrder) int
 		ReturnItem       func(childComplexity int, input *model.ItemTransaction) int
 		SellItem         func(childComplexity int, input *model.ItemTransaction) int
-		SetSaleItem      func(childComplexity int, input *model.ItemPromotion) int
+		StartSaleItem    func(childComplexity int, input *model.ItemPromotion) int
 		UpdateDepartment func(childComplexity int, input *model.UpdateDepartment) int
 		UpdateItem       func(childComplexity int, input *model.UpdateItem) int
 		UpdateManager    func(childComplexity int, input *model.UpdateManager) int
@@ -116,7 +117,8 @@ type MutationResolver interface {
 	SellItem(ctx context.Context, input *model.ItemTransaction) (*model.Item, error)
 	ReturnItem(ctx context.Context, input *model.ItemTransaction) (*model.Item, error)
 	OrderItems(ctx context.Context, input *model.ItemOrder) (*model.Item, error)
-	SetSaleItem(ctx context.Context, input *model.ItemPromotion) (*model.Item, error)
+	StartSaleItem(ctx context.Context, input *model.ItemPromotion) (*model.Item, error)
+	EndSaleItem(ctx context.Context, input *string) (*string, error)
 	AddDepartment(ctx context.Context, input *model.NewDepartment) (*model.Department, error)
 	UpdateDepartment(ctx context.Context, input *model.UpdateDepartment) (*model.Department, error)
 	DeleteDepartment(ctx context.Context, id *string) (*string, error)
@@ -395,6 +397,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.DeleteManager(childComplexity, args["id"].(*string)), true
 
+	case "Mutation.endSaleItem":
+		if e.complexity.Mutation.EndSaleItem == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_endSaleItem_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.EndSaleItem(childComplexity, args["input"].(*string)), true
+
 	case "Mutation.orderItems":
 		if e.complexity.Mutation.OrderItems == nil {
 			break
@@ -431,17 +445,17 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.SellItem(childComplexity, args["input"].(*model.ItemTransaction)), true
 
-	case "Mutation.setSaleItem":
-		if e.complexity.Mutation.SetSaleItem == nil {
+	case "Mutation.startSaleItem":
+		if e.complexity.Mutation.StartSaleItem == nil {
 			break
 		}
 
-		args, err := ec.field_Mutation_setSaleItem_args(context.TODO(), rawArgs)
+		args, err := ec.field_Mutation_startSaleItem_args(context.TODO(), rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Mutation.SetSaleItem(childComplexity, args["input"].(*model.ItemPromotion)), true
+		return e.complexity.Mutation.StartSaleItem(childComplexity, args["input"].(*model.ItemPromotion)), true
 
 	case "Mutation.updateDepartment":
 		if e.complexity.Mutation.UpdateDepartment == nil {
@@ -785,6 +799,21 @@ func (ec *executionContext) field_Mutation_deleteManager_args(ctx context.Contex
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_endSaleItem_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *string
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalOID2ᚖstring(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_orderItems_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -830,7 +859,7 @@ func (ec *executionContext) field_Mutation_sellItem_args(ctx context.Context, ra
 	return args, nil
 }
 
-func (ec *executionContext) field_Mutation_setSaleItem_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Mutation_startSaleItem_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 *model.ItemPromotion
@@ -1153,11 +1182,14 @@ func (ec *executionContext) _Department_createdAt(ctx context.Context, field gra
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Department_createdAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1194,11 +1226,14 @@ func (ec *executionContext) _Department_updatedAt(ctx context.Context, field gra
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Department_updatedAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1719,11 +1754,14 @@ func (ec *executionContext) _Item_createdAt(ctx context.Context, field graphql.C
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Item_createdAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1760,11 +1798,14 @@ func (ec *executionContext) _Item_updatedAt(ctx context.Context, field graphql.C
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Item_updatedAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1974,11 +2015,14 @@ func (ec *executionContext) _Manager_createdAt(ctx context.Context, field graphq
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Manager_createdAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2015,11 +2059,14 @@ func (ec *executionContext) _Manager_updatedAt(ctx context.Context, field graphq
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Manager_updatedAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2487,8 +2534,8 @@ func (ec *executionContext) fieldContext_Mutation_orderItems(ctx context.Context
 	return fc, nil
 }
 
-func (ec *executionContext) _Mutation_setSaleItem(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_setSaleItem(ctx, field)
+func (ec *executionContext) _Mutation_startSaleItem(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_startSaleItem(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -2501,7 +2548,7 @@ func (ec *executionContext) _Mutation_setSaleItem(ctx context.Context, field gra
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().SetSaleItem(rctx, fc.Args["input"].(*model.ItemPromotion))
+		return ec.resolvers.Mutation().StartSaleItem(rctx, fc.Args["input"].(*model.ItemPromotion))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2515,7 +2562,7 @@ func (ec *executionContext) _Mutation_setSaleItem(ctx context.Context, field gra
 	return ec.marshalOItem2ᚖgithubᚗcomᚋawoelfᚋgoᚑretailᚋgraphᚋmodelᚐItem(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Mutation_setSaleItem(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Mutation_startSaleItem(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Mutation",
 		Field:      field,
@@ -2560,7 +2607,59 @@ func (ec *executionContext) fieldContext_Mutation_setSaleItem(ctx context.Contex
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_setSaleItem_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_Mutation_startSaleItem_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_endSaleItem(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_endSaleItem(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().EndSaleItem(rctx, fc.Args["input"].(*string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOID2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_endSaleItem(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_endSaleItem_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -5429,7 +5528,7 @@ func (ec *executionContext) unmarshalInputItemOrder(ctx context.Context, obj int
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "qty"}
+	fieldsInOrder := [...]string{"id", "qtyOrder"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -5443,13 +5542,13 @@ func (ec *executionContext) unmarshalInputItemOrder(ctx context.Context, obj int
 				return it, err
 			}
 			it.ID = data
-		case "qty":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("qty"))
+		case "qtyOrder":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("qtyOrder"))
 			data, err := ec.unmarshalNInt2int(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.Qty = data
+			it.QtyOrder = data
 		}
 	}
 
@@ -5504,7 +5603,7 @@ func (ec *executionContext) unmarshalInputItemTransaction(ctx context.Context, o
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "qtySold"}
+	fieldsInOrder := [...]string{"id", "qtyTransaction"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -5518,13 +5617,13 @@ func (ec *executionContext) unmarshalInputItemTransaction(ctx context.Context, o
 				return it, err
 			}
 			it.ID = data
-		case "qtySold":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("qtySold"))
+		case "qtyTransaction":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("qtyTransaction"))
 			data, err := ec.unmarshalNInt2int(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.QtySold = data
+			it.QtyTransaction = data
 		}
 	}
 
@@ -5873,8 +5972,14 @@ func (ec *executionContext) _Department(ctx context.Context, sel ast.SelectionSe
 			out.Values[i] = ec._Department_totalSalesDept(ctx, field, obj)
 		case "createdAt":
 			out.Values[i] = ec._Department_createdAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		case "updatedAt":
 			out.Values[i] = ec._Department_updatedAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -5966,8 +6071,14 @@ func (ec *executionContext) _Item(ctx context.Context, sel ast.SelectionSet, obj
 			}
 		case "createdAt":
 			out.Values[i] = ec._Item_createdAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		case "updatedAt":
 			out.Values[i] = ec._Item_updatedAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -6021,8 +6132,14 @@ func (ec *executionContext) _Manager(ctx context.Context, sel ast.SelectionSet, 
 			}
 		case "createdAt":
 			out.Values[i] = ec._Manager_createdAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		case "updatedAt":
 			out.Values[i] = ec._Manager_updatedAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -6089,9 +6206,13 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_orderItems(ctx, field)
 			})
-		case "setSaleItem":
+		case "startSaleItem":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_setSaleItem(ctx, field)
+				return ec._Mutation_startSaleItem(ctx, field)
+			})
+		case "endSaleItem":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_endSaleItem(ctx, field)
 			})
 		case "addDepartment":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {

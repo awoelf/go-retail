@@ -6,8 +6,8 @@ type Department struct {
 	ID             string   `json:"id"`
 	Name           string   `json:"name"`
 	TotalSalesDept *float64 `json:"totalSalesDept,omitempty"`
-	CreatedAt      *string  `json:"createdAt,omitempty"`
-	UpdatedAt      *string  `json:"updatedAt,omitempty"`
+	CreatedAt      string   `json:"createdAt"`
+	UpdatedAt      string   `json:"updatedAt"`
 }
 
 type Item struct {
@@ -22,13 +22,13 @@ type Item struct {
 	PromoPrice     float64 `json:"promoPrice"`
 	TotalSalesItem float64 `json:"totalSalesItem"`
 	Aisle          string  `json:"aisle"`
-	CreatedAt      *string `json:"createdAt,omitempty"`
-	UpdatedAt      *string `json:"updatedAt,omitempty"`
+	CreatedAt      string  `json:"createdAt"`
+	UpdatedAt      string  `json:"updatedAt"`
 }
 
 type ItemOrder struct {
-	ID  string `json:"id"`
-	Qty int    `json:"qty"`
+	ID       string `json:"id"`
+	QtyOrder int    `json:"qtyOrder"`
 }
 
 type ItemPromotion struct {
@@ -38,8 +38,8 @@ type ItemPromotion struct {
 }
 
 type ItemTransaction struct {
-	ID      string `json:"id"`
-	QtySold int    `json:"qtySold"`
+	ID             string `json:"id"`
+	QtyTransaction int    `json:"qtyTransaction"`
 }
 
 type Manager struct {
@@ -47,8 +47,8 @@ type Manager struct {
 	DepartmentID *string `json:"departmentId,omitempty"`
 	FirstName    string  `json:"firstName"`
 	LastName     string  `json:"lastName"`
-	CreatedAt    *string `json:"createdAt,omitempty"`
-	UpdatedAt    *string `json:"updatedAt,omitempty"`
+	CreatedAt    string  `json:"createdAt"`
+	UpdatedAt    string  `json:"updatedAt"`
 }
 
 type Mutation struct {

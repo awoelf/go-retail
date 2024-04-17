@@ -3,51 +3,80 @@ package services
 import (
 	"context"
 	"log"
+	"time"
 
-	"github.com/awoelf/go-retail/config"
 	"github.com/awoelf/go-retail/graph/model"
 )
 
-type Item struct{ model.Item }
+type Item struct{}
 
-func (i *Item) AddItem(ctx context.Context, input *model.NewItem) (int64, error) {
-	stmt, err := config.DB.Prepare("INSERT INTO Items(Name, Price, Qty, Category, Aisle, DepartmentID) VALUES(?,?,?,?,?,?)")
+func (i *Item) AddItem(ctx context.Context, input *model.NewItem) (*model.NewItem, error) {
+	ctx, cancel := context.WithTimeout(ctx, Timeout)
+	defer cancel()
+
+	query := `
+		INSERT INTO Items(
+			DepartmentID, 
+			Name, 
+			Price, 
+			Qty, 
+			Category, 
+			Aisle, 
+			CreatedAt, 
+			UpdatedAt
+		) 
+		VALUES($1,$2,$3,$4,$5,$6,$7,$8) returning *`
+
+	_, err := db.ExecContext(
+		ctx,
+		query,
+		input.DepartmentID,
+		input.Name,
+		input.Price,
+		input.Qty,
+		input.Category,
+		input.Aisle,
+		time.Now(),
+		time.Now(),
+	)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
-	res, err := stmt.ExecContext(ctx, input.Name, input.Price, input.Qty, input.Category, input.Aisle, input.DepartmentID)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	id, err := res.LastInsertId()
-	if err != nil {
-		log.Fatal("Error:", err.Error())
-	}
-
-	return id, nil
+	return input, nil
 }
 
 func (i *Item) GetAllItems(ctx context.Context) ([]*model.Item, error) {
-	stmt, err := config.DB.Prepare("SELECT * FROM Items ORDER BY ID")
-	if err != nil {
-		log.Fatal(err)
-	}
+	ctx, cancel := context.WithTimeout(ctx, Timeout)
+	defer cancel()
 
-	res, err := stmt.QueryContext(ctx)
+	query := `SELECT * FROM Items ORDER BY ID`
+
+	rows, err := db.QueryContext(ctx, query)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
-	defer res.Close()
 
 	var items []*model.Item
-
-	for res.Next() {
+	for rows.Next() {
 		var item model.Item
-		err := res.Scan(&item.ID, &item.Name, &item.Price, &item.Qty, &item.Category, &item.Promo, &item.PromoPrice, &item.TotalSalesItem, &item.Aisle, &item.DepartmentID, &item.CreatedAt, &item.UpdatedAt)
+		err := rows.Scan(
+			&item.ID,
+			&item.DepartmentID,
+			&item.Name,
+			&item.Price,
+			&item.Qty,
+			&item.QtySold,
+			&item.Category,
+			&item.Promo,
+			&item.PromoPrice,
+			&item.TotalSalesItem,
+			&item.Aisle,
+			&item.CreatedAt,
+			&item.UpdatedAt,
+		)
 		if err != nil {
-			log.Fatal(err)
+			return nil, err
 		}
 		items = append(items, &item)
 	}
@@ -55,161 +84,178 @@ func (i *Item) GetAllItems(ctx context.Context) ([]*model.Item, error) {
 	return items, nil
 }
 
-func (i *Item) GetItemById(ctx context.Context, id int64) (*model.Item, error) {
-	stmt, err := config.DB.Prepare("SELECT * FROM Items WHERE ID = ?")
-	if err != nil {
-		log.Fatal(err)
-	}
+func (i *Item) GetItemById(ctx context.Context, id string) (*model.Item, error) {
+	ctx, cancel := context.WithTimeout(ctx, Timeout)
+	defer cancel()
 
-	res, err := stmt.QueryContext(ctx, id)
-	if err != nil {
-		log.Fatal(err)
-	}
-	
-	defer res.Close()
+	query := `SELECT * FROM Items WHERE ID = $1`
+
+	row := db.QueryRowContext(ctx, query, id)
 
 	var item model.Item
-
-	for res.Next() {
-		err = res.Scan(&item.ID, &item.Name, &item.Price, &item.Qty, &item.Category, &item.Promo, &item.PromoPrice, &item.TotalSalesItem, &item.Aisle, &item.DepartmentID, &item.CreatedAt, &item.UpdatedAt)
-		if err != nil {
-			log.Fatal(err)
-		}
+	err := row.Scan(
+		&item.ID,
+		&item.DepartmentID,
+		&item.Name,
+		&item.Price,
+		&item.Qty,
+		&item.QtySold,
+		&item.Category,
+		&item.Promo,
+		&item.PromoPrice,
+		&item.TotalSalesItem,
+		&item.Aisle,
+		&item.CreatedAt,
+		&item.UpdatedAt,
+	)
+	if err != nil {
+		return nil, err
 	}
 
 	return &item, nil
 }
 
-func (i *Item) UpdateItem(ctx context.Context, input *model.UpdateItem) (int64, error) {
-	stmt, err := config.DB.Prepare("UPDATE Items SET Name = ?, Price = ?, Qty = ?, Category = ?, Promotion = ?, TotalSalesItem = ?, Aisle = ?, DepartmentID = ?, UpdatedAt = NOW() WHERE ID = ?")
+func (i *Item) UpdateItem(ctx context.Context, input *model.UpdateItem) (*model.UpdateItem, error) {
+	ctx, cancel := context.WithTimeout(ctx, Timeout)
+	defer cancel()
+
+	query := `UPDATE Items 
+		SET 
+			Name = $1,
+			DepartmentID = $2,
+			Price = $3, 
+			Qty = $4, 
+			QtySold = $5
+			Category = $6, 
+			Promo = $7,
+			PromoPrice = $8
+			TotalSalesItem = $9, 
+			Aisle = $10,
+			UpdatedAt = $11 
+		WHERE ID = $12
+		returning *
+	`
+
+	_, err := db.ExecContext(
+		ctx,
+		query,
+		input.Name,
+		input.DepartmentID,
+		input.Price,
+		input.Qty,
+		input.QtySold,
+		input.Category,
+		input.Promo,
+		input.PromoPrice,
+		input.TotalSalesItem,
+		input.Aisle,
+		time.Now(),
+		input.ID,
+	)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
-	res, err := stmt.ExecContext(ctx, input.Name, input.Price, input.Qty, input.Category, input.Promo, input.PromoPrice, input.TotalSalesItem, input.Aisle, input.DepartmentID, input.ID)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	id, err := res.LastInsertId()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return id, nil
+	return input, nil
 }
 
-func (i *Item) DeleteItem(ctx context.Context, id int64) error {
-	stmt, err := config.DB.Prepare("DELETE FROM Items WHERE ID = ?")
-	if err != nil {
-		log.Fatal(err)
-	}
+func (i *Item) DeleteItem(ctx context.Context, id string) error {
+	ctx, cancel := context.WithTimeout(ctx, Timeout)
+	defer cancel()
 
-	_, err = stmt.ExecContext(ctx, id)
+	query := `DELETE FROM Items WHERE ID = ?`
+
+	_, err := db.ExecContext(ctx, query, id)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	return nil
 }
 
-func (i *Item) SellItem(ctx context.Context, input *model.ItemTransaction) (int64, error) {
-	// TODO: Add sales to department total
+func (i *Item) SellItem(ctx context.Context, input *model.ItemTransaction) (*model.ItemTransaction, error) {
+	ctx, cancel := context.WithTimeout(ctx, Timeout)
+	defer cancel()
 
-	// stmtDept, err := config.DB.Prepare("UPDATE Departments SET TotalSalesDept = (TotalSalesDept + ?) WHERE ID = ?")
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// _, err = stmtDept.ExecContext(ctx, totalSales, input.DepartmentID)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
+	query := `UPDATE Items SET 
+		Qty = (Qty - $1), 
+		QtySold = (QtySold + $1),
+		UpdatedAt = $2
+		WHERE ID = $3
+	`
 
-	// Add sales to item total and remove quantity from item
-	stmtItem, err := config.DB.Prepare("UPDATE Items SET Qty = (Qty - ?), QtySold = (QtySold + ?) WHERE ID = ?")
+	_, err := db.ExecContext(ctx, query, input.QtyTransaction, time.Now(), input.ID)
 	if err != nil {
-		log.Fatal(err)
-	}
-	res, err := stmtItem.ExecContext(ctx, input.QtySold, input.QtySold, input.ID)
-	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
-	id, err := res.LastInsertId()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return id, nil
+	return input, nil
 }
 
-func (i *Item) ReturnItem(ctx context.Context, input *model.ItemTransaction) (int64, error) {
-	// TODO: Remove sales from department total
-	// stmtDept, err := config.DB.Prepare("UPDATE Departments SET TotalSalesDept = (TotalSalesDept - ?) WHERE ID = ?")
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// _, err = stmtDept.ExecContext(ctx, totalSales, input.DepartmentID)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
+func (i *Item) ReturnItem(ctx context.Context, input *model.ItemTransaction) (*model.ItemTransaction, error) {
+	ctx, cancel := context.WithTimeout(ctx, Timeout)
+	defer cancel()
 
-	// Remove sales from item total and add quantity to item
-	stmtItem, err := config.DB.Prepare("UPDATE Items SET Qty = (Qty + ?), QtySold = (QtySold - ?) WHERE ID = ?")
+	query := `UPDATE Items SET 
+		Qty = (Qty + $1), 
+		QtySold = (QtySold - $1),
+		UpdatedAt = $2
+		WHERE ID = $3
+	`
+
+	_, err := db.ExecContext(ctx, query, input.QtyTransaction, time.Now(), input.ID)
 	if err != nil {
-		log.Fatal(err)
-	}
-	res, err := stmtItem.ExecContext(ctx, input.QtySold, input.QtySold, input.ID)
-	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
-	id, err := res.LastInsertId()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return id, nil
+	return input, nil
 }
 
-func (i *Item) OrderItems(ctx context.Context, input *model.ItemOrder) (int64, error) {
-	stmt, err := config.DB.Prepare("UPDATE Items SET Qty = (Qty + ?) WHERE ID = ?")
+func (i *Item) OrderItems(ctx context.Context, input *model.ItemOrder) (*model.ItemOrder, error) {
+	ctx, cancel := context.WithTimeout(ctx, Timeout)
+	defer cancel()
+
+	query := `UPDATE Items SET Qty = (Qty + $1), UpdatedAt = $2 WHERE ID = $3`
+
+	_, err := db.ExecContext(ctx, query, input.QtyOrder, time.Now(), input.ID)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
-	res, err := stmt.ExecContext(ctx, input.Qty, input.ID)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	id, err := res.LastInsertId()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return id, nil
+	return input, nil
 }
 
 func (i *Item) GetTopItems(ctx context.Context) ([]*model.Item, error) {
-	stmt, err := config.DB.Prepare("SELECT * FROM Items ORDER BY QtySold DESC")
-	if err != nil {
-		log.Fatal(err)
-	}
+	ctx, cancel := context.WithTimeout(ctx, Timeout)
+	defer cancel()
 
-	res, err := stmt.QueryContext(ctx)
+	query := `SELECT * FROM Items ORDER BY QtySold DESC`
+
+	rows, err := db.QueryContext(ctx, query)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
-	defer res.Close()
 
 	var items []*model.Item
-
-	for res.Next() {
+	for rows.Next() {
 		var item model.Item
-		err := res.Scan(&item.ID, &item.Name, &item.Price, &item.Qty, &item.Category, &item.Promo, &item.PromoPrice, &item.TotalSalesItem, &item.Aisle, &item.DepartmentID, &item.CreatedAt, &item.UpdatedAt)
+		err := rows.Scan(
+			&item.ID,
+			&item.DepartmentID,
+			&item.Name,
+			&item.Price,
+			&item.Qty,
+			&item.QtySold,
+			&item.Category,
+			&item.Promo,
+			&item.PromoPrice,
+			&item.TotalSalesItem,
+			&item.Aisle,
+			&item.CreatedAt,
+			&item.UpdatedAt,
+		)
 		if err != nil {
-			log.Fatal(err)
+			return nil, err
 		}
 		items = append(items, &item)
 	}
@@ -218,24 +264,36 @@ func (i *Item) GetTopItems(ctx context.Context) ([]*model.Item, error) {
 }
 
 func (i *Item) GetItemsByCategory(ctx context.Context, category *string) ([]*model.Item, error) {
-	stmt, err := config.DB.Prepare("SELECT * FROM Items WHERE Category = ?")
-	if err != nil {
-		log.Fatal(err)
-	}
+	ctx, cancel := context.WithTimeout(ctx, Timeout)
+	defer cancel()
 
-	res, err := stmt.QueryContext(ctx, category)
+	query := `SELECT * FROM Items WHERE Category = $1`
+
+	rows, err := db.QueryContext(ctx, query, category)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
-	defer res.Close()
 
 	var items []*model.Item
-
-	for res.Next() {
+	for rows.Next() {
 		var item model.Item
-		err := res.Scan(&item.ID, &item.Name, &item.Price, &item.Qty, &item.Category, &item.Promo, &item.PromoPrice, &item.TotalSalesItem, &item.Aisle, &item.DepartmentID, &item.CreatedAt, &item.UpdatedAt)
+		err := rows.Scan(
+			&item.ID,
+			&item.DepartmentID,
+			&item.Name,
+			&item.Price,
+			&item.Qty,
+			&item.QtySold,
+			&item.Category,
+			&item.Promo,
+			&item.PromoPrice,
+			&item.TotalSalesItem,
+			&item.Aisle,
+			&item.CreatedAt,
+			&item.UpdatedAt,
+		)
 		if err != nil {
-			log.Fatal(err)
+			return nil, err
 		}
 		items = append(items, &item)
 	}
@@ -243,35 +301,27 @@ func (i *Item) GetItemsByCategory(ctx context.Context, category *string) ([]*mod
 	return items, nil
 }
 
-func (i *Item) SetSaleItem(ctx context.Context, input *model.ItemPromotion) (int64, error) {
-	stmt, err := config.DB.Prepare("UPDATE Items SET Price = ?, Promotion = true WHERE ID = ?")
+func (i *Item) StartSaleItem(ctx context.Context, input *model.ItemPromotion) (*model.ItemPromotion, error) {
+	ctx, cancel := context.WithTimeout(ctx, Timeout)
+	defer cancel()
+
+	query := `UPDATE Items SET Promo = $1, PromoPrice = $2 WHERE ID = $3`
+
+	_, err := db.ExecContext(ctx, query, input.Promo, input.PromoPrice, input.ID)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
-	res, err := stmt.ExecContext(ctx, input)
-	if err != nil {
-		log.Fatal(err)
-	}
-	id, err := res.LastInsertId()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return id, nil
+	return input, nil
 }
 
-func (i *Item) ResetItem(ctx context.Context, input *model.ItemPromotion) (int64, error) {
-	stmt, err := config.DB.Prepare("UPDATE Items SET Price = ?, Promotion = false WHERE ID = ?")
-	if err != nil {
-		log.Fatal(err)
-	}
+func (i *Item) EndSaleItem(ctx context.Context, id *string) (*string, error) {
+	ctx, cancel := context.WithTimeout(ctx, Timeout)
+	defer cancel()
 
-	res, err := stmt.ExecContext(ctx, input)
-	if err != nil {
-		log.Fatal(err)
-	}
-	id, err := res.LastInsertId()
+	query := `UPDATE Items SET Promotion = false WHERE ID = $1`
+
+	_, err := db.ExecContext(ctx, query, id)
 	if err != nil {
 		log.Fatal(err)
 	}

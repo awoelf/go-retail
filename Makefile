@@ -1,9 +1,10 @@
 include .env
 
-init_graph:
+init_gql:
 	go run github.com/99designs/gqlgen init; \
 
-generate_graph:
+gql:
+	go get github.com/99designs/gqlgen@v0.17.45;
 	go run github.com/99designs/gqlgen generate; \
 
 create_migrations:
