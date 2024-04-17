@@ -41,7 +41,8 @@ func (app *Application) Serve() error {
 func main() {
 	loadEnv()
 
-	dsn := os.Getenv("DSN")
+	dsn := os.Getenv("DB_URL")
+	log.Print(dsn)
 	dbConn, err := db.Connect(dsn)
 	if err != nil {
 		log.Panic(err)
