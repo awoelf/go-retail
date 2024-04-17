@@ -1182,14 +1182,11 @@ func (ec *executionContext) _Department_createdAt(ctx context.Context, field gra
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(*string)
 	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Department_createdAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1226,14 +1223,11 @@ func (ec *executionContext) _Department_updatedAt(ctx context.Context, field gra
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(*string)
 	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Department_updatedAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1490,14 +1484,11 @@ func (ec *executionContext) _Item_qtySold(ctx context.Context, field graphql.Col
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
-	res := resTmp.(int)
+	res := resTmp.(*int)
 	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Item_qtySold(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1534,14 +1525,11 @@ func (ec *executionContext) _Item_category(ctx context.Context, field graphql.Co
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(*string)
 	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Item_category(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1578,14 +1566,11 @@ func (ec *executionContext) _Item_promo(ctx context.Context, field graphql.Colle
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
-	res := resTmp.(bool)
+	res := resTmp.(*bool)
 	fc.Result = res
-	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+	return ec.marshalOBoolean2ᚖbool(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Item_promo(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1622,14 +1607,11 @@ func (ec *executionContext) _Item_promoPrice(ctx context.Context, field graphql.
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
-	res := resTmp.(float64)
+	res := resTmp.(*float64)
 	fc.Result = res
-	return ec.marshalNFloat2float64(ctx, field.Selections, res)
+	return ec.marshalOFloat2ᚖfloat64(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Item_promoPrice(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1666,14 +1648,11 @@ func (ec *executionContext) _Item_totalSalesItem(ctx context.Context, field grap
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
-	res := resTmp.(float64)
+	res := resTmp.(*float64)
 	fc.Result = res
-	return ec.marshalNFloat2float64(ctx, field.Selections, res)
+	return ec.marshalOFloat2ᚖfloat64(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Item_totalSalesItem(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1754,14 +1733,11 @@ func (ec *executionContext) _Item_createdAt(ctx context.Context, field graphql.C
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(*string)
 	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Item_createdAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1798,14 +1774,11 @@ func (ec *executionContext) _Item_updatedAt(ctx context.Context, field graphql.C
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(*string)
 	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Item_updatedAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2015,14 +1988,11 @@ func (ec *executionContext) _Manager_createdAt(ctx context.Context, field graphq
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(*string)
 	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Manager_createdAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2059,14 +2029,11 @@ func (ec *executionContext) _Manager_updatedAt(ctx context.Context, field graphq
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(*string)
 	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Manager_updatedAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -5664,7 +5631,7 @@ func (ec *executionContext) unmarshalInputNewItem(ctx context.Context, obj inter
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"departmentId", "name", "price", "qty", "category", "aisle"}
+	fieldsInOrder := [...]string{"departmentId", "name", "price", "qty", "qtySold", "category", "promo", "promoPrice", "totalSalesItem", "aisle"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -5699,13 +5666,41 @@ func (ec *executionContext) unmarshalInputNewItem(ctx context.Context, obj inter
 				return it, err
 			}
 			it.Qty = data
+		case "qtySold":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("qtySold"))
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.QtySold = data
 		case "category":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("category"))
-			data, err := ec.unmarshalNString2string(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.Category = data
+		case "promo":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("promo"))
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Promo = data
+		case "promoPrice":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("promoPrice"))
+			data, err := ec.unmarshalOFloat2ᚖfloat64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.PromoPrice = data
+		case "totalSalesItem":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("totalSalesItem"))
+			data, err := ec.unmarshalOFloat2ᚖfloat64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.TotalSalesItem = data
 		case "aisle":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("aisle"))
 			data, err := ec.unmarshalNString2string(ctx, v)
@@ -5972,14 +5967,8 @@ func (ec *executionContext) _Department(ctx context.Context, sel ast.SelectionSe
 			out.Values[i] = ec._Department_totalSalesDept(ctx, field, obj)
 		case "createdAt":
 			out.Values[i] = ec._Department_createdAt(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
 		case "updatedAt":
 			out.Values[i] = ec._Department_updatedAt(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -6041,29 +6030,14 @@ func (ec *executionContext) _Item(ctx context.Context, sel ast.SelectionSet, obj
 			}
 		case "qtySold":
 			out.Values[i] = ec._Item_qtySold(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
 		case "category":
 			out.Values[i] = ec._Item_category(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
 		case "promo":
 			out.Values[i] = ec._Item_promo(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
 		case "promoPrice":
 			out.Values[i] = ec._Item_promoPrice(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
 		case "totalSalesItem":
 			out.Values[i] = ec._Item_totalSalesItem(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
 		case "aisle":
 			out.Values[i] = ec._Item_aisle(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -6071,14 +6045,8 @@ func (ec *executionContext) _Item(ctx context.Context, sel ast.SelectionSet, obj
 			}
 		case "createdAt":
 			out.Values[i] = ec._Item_createdAt(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
 		case "updatedAt":
 			out.Values[i] = ec._Item_updatedAt(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -6132,14 +6100,8 @@ func (ec *executionContext) _Manager(ctx context.Context, sel ast.SelectionSet, 
 			}
 		case "createdAt":
 			out.Values[i] = ec._Manager_createdAt(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
 		case "updatedAt":
 			out.Values[i] = ec._Manager_updatedAt(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}

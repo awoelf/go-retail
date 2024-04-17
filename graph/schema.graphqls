@@ -8,8 +8,8 @@ type Department {
 	id: ID!
 	name: String!
 	totalSalesDept: Float
-	createdAt: String!
-	updatedAt: String!
+	createdAt: String
+	updatedAt: String
 }
 
 type Manager {
@@ -17,8 +17,8 @@ type Manager {
 	departmentId: ID # FK
 	firstName: String!
 	lastName: String!
-	createdAt: String!
-	updatedAt: String!
+	createdAt: String
+	updatedAt: String
 }
 
 type Item {
@@ -27,14 +27,14 @@ type Item {
 	name: String!
 	price: Float!
 	qty: Int!
-	qtySold: Int!
-	category: String!
-	promo: Boolean!
-	promoPrice: Float!
-	totalSalesItem: Float!
+	qtySold: Int
+	category: String
+	promo: Boolean
+	promoPrice: Float
+	totalSalesItem: Float
 	aisle: String!
-	createdAt: String!
-	updatedAt: String!
+	createdAt: String
+	updatedAt: String
 }
 
 input NewItem {
@@ -42,7 +42,11 @@ input NewItem {
 	name: String!
 	price: Float!
 	qty: Int!
-	category: String!
+	qtySold: Int
+	category: String
+	promo: Boolean
+	promoPrice: Float
+	totalSalesItem: Float
 	aisle: String!
 }
 

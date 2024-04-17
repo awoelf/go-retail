@@ -10,35 +10,54 @@ import (
 	"log"
 
 	"github.com/awoelf/go-retail/graph/model"
-	"github.com/awoelf/go-retail/services"
 )
 
 // AddItem is the resolver for the addItem field.
 func (r *mutationResolver) AddItem(ctx context.Context, input *model.NewItem) (*model.Item, error) {
-	var Item services.Item
-	_, err := Item.AddItem(ctx, input)
+	res, err := r.Services.Item.AddItem(ctx, input)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	return &model.Item{ID: id, Name: input.Name, Price: input.Price, Qty: input.Qty, Category: input.Category, Aisle: input.Aisle, DepartmentID: input.DepartmentID}, nil
+	return &model.Item{
+		DepartmentID:   res.DepartmentID,
+		Name:           res.Name,
+		Price:          res.Price,
+		Qty:            res.Qty,
+		QtySold:        res.QtySold,
+		Category:       res.Category,
+		Promo:          res.Promo,
+		PromoPrice:     res.PromoPrice,
+		TotalSalesItem: res.TotalSalesItem,
+		Aisle:          res.Aisle,
+	}, nil
 }
 
 // UpdateItem is the resolver for the updateItem field.
 func (r *mutationResolver) UpdateItem(ctx context.Context, input *model.UpdateItem) (*model.Item, error) {
-	var Item services.Item
-	id, err := Item.UpdateItem(ctx, input)
+	res, err := r.Services.Item.UpdateItem(ctx, input)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	return &model.Item{ID: int(id), Name: input.Name, Price: input.Price, Qty: input.Qty, Category: input.Category, Promotion: &input.Promotion, TotalSalesItem: &input.TotalSalesItem, Aisle: input.Aisle}, nil
+	return &model.Item{
+		ID:             res.ID,
+		DepartmentID:   *res.DepartmentID,
+		Name:           *res.Name,
+		Price:          *res.Price,
+		Qty:            *res.Qty,
+		QtySold:        res.QtySold,
+		Category:       res.Category,
+		Promo:          res.Promo,
+		PromoPrice:     res.PromoPrice,
+		TotalSalesItem: res.TotalSalesItem,
+		Aisle:          *res.Aisle,
+	}, nil
 }
 
 // DeleteItem is the resolver for the deleteItem field.
 func (r *mutationResolver) DeleteItem(ctx context.Context, id *string) (*string, error) {
-	var Item services.Item
-	err := Item.DeleteItem(ctx, int64(*id))
+	err := r.Services.Item.DeleteItem(ctx, id)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -48,35 +67,38 @@ func (r *mutationResolver) DeleteItem(ctx context.Context, id *string) (*string,
 
 // SellItem is the resolver for the sellItem field.
 func (r *mutationResolver) SellItem(ctx context.Context, input *model.ItemTransaction) (*model.Item, error) {
-	var Item services.Item
-	id, err := Item.SellItem(ctx, input)
+	res, err := r.Services.Item.SellItem(ctx, input)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	return &model.Item{ID: int(id)}, nil
+	return &model.Item{
+		ID: res.ID,
+	}, nil
 }
 
 // ReturnItem is the resolver for the returnItem field.
 func (r *mutationResolver) ReturnItem(ctx context.Context, input *model.ItemTransaction) (*model.Item, error) {
-	var Item services.Item
-	id, err := Item.ReturnItem(ctx, input)
+	res, err := r.Services.Item.ReturnItem(ctx, input)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	return &model.Item{ID: int(id), QtySold: input.QtySold}, nil
+	return &model.Item{
+		ID: res.ID,
+	}, nil
 }
 
 // OrderItems is the resolver for the orderItems field.
 func (r *mutationResolver) OrderItems(ctx context.Context, input *model.ItemOrder) (*model.Item, error) {
-	var Item services.Item
-	id, err := Item.OrderItems(ctx, input)
+	res, err := r.Services.Item.OrderItems(ctx, input)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	return &model.Item{ID: int(id), Qty: input.Qty}, nil
+	return &model.Item{
+		ID: res.ID,
+	}, nil
 }
 
 // StartSaleItem is the resolver for the startSaleItem field.
@@ -91,199 +113,77 @@ func (r *mutationResolver) EndSaleItem(ctx context.Context, input *string) (*str
 
 // AddDepartment is the resolver for the addDepartment field.
 func (r *mutationResolver) AddDepartment(ctx context.Context, input *model.NewDepartment) (*model.Department, error) {
-	var Department services.Department
-	id, err := Department.AddDepartment(ctx, input)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	fmt.Printf("res: %v\n", id)
-	return &model.Department{ID: id, Name: input.Name}, nil
+	panic(fmt.Errorf("not implemented: AddDepartment - addDepartment"))
 }
 
 // UpdateDepartment is the resolver for the updateDepartment field.
 func (r *mutationResolver) UpdateDepartment(ctx context.Context, input *model.UpdateDepartment) (*model.Department, error) {
-	var Department services.Department
-	id, err := Department.UpdateDepartment(ctx, input)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return &model.Department{ID: int(id), Name: input.Name, TotalSalesDept: &input.TotalSalesDept}, nil
+	panic(fmt.Errorf("not implemented: UpdateDepartment - updateDepartment"))
 }
 
 // DeleteDepartment is the resolver for the deleteDepartment field.
 func (r *mutationResolver) DeleteDepartment(ctx context.Context, id *string) (*string, error) {
-	var Department services.Department
-	err := Department.DeleteDepartment(ctx, int64(*id))
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return id, nil
+	panic(fmt.Errorf("not implemented: DeleteDepartment - deleteDepartment"))
 }
 
 // AddManager is the resolver for the addManager field.
 func (r *mutationResolver) AddManager(ctx context.Context, input *model.NewManager) (*model.Manager, error) {
-	var Manager services.Manager
-	id, err := Manager.AddManager(ctx, input)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	fmt.Printf("res: %v\n", id)
-	return &model.Manager{ID: int(id), FirstName: input.FirstName, LastName: input.LastName, DepartmentID: &input.DepartmentID}, nil
+	panic(fmt.Errorf("not implemented: AddManager - addManager"))
 }
 
 // UpdateManager is the resolver for the updateManager field.
 func (r *mutationResolver) UpdateManager(ctx context.Context, input *model.UpdateManager) (*model.Manager, error) {
-	var Manager services.Manager
-	id, err := Manager.UpdateManager(ctx, input)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return &model.Manager{ID: int(id), FirstName: input.FirstName, LastName: input.LastName, DepartmentID: &input.DepartmentID}, nil
+	panic(fmt.Errorf("not implemented: UpdateManager - updateManager"))
 }
 
 // DeleteManager is the resolver for the deleteManager field.
 func (r *mutationResolver) DeleteManager(ctx context.Context, id *string) (*string, error) {
-	var Manager services.Manager
-	err := Manager.DeleteManager(ctx, int64(*id))
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return id, nil
+	panic(fmt.Errorf("not implemented: DeleteManager - deleteManager"))
 }
 
 // GetAllItems is the resolver for the getAllItems field.
 func (r *queryResolver) GetAllItems(ctx context.Context) ([]*model.Item, error) {
-	var Item services.Item
-	var resItems []*model.Item
-	dbItems, err := Item.GetAllItems(ctx)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	for _, item := range dbItems {
-		resItems = append(resItems, &model.Item{ID: item.ID, Name: item.Name, Price: item.Price, Qty: item.Qty, Category: item.Category, Promotion: item.Promotion, TotalSalesItem: item.TotalSalesItem, Aisle: item.Aisle, DepartmentID: item.DepartmentID})
-	}
-
-	return resItems, nil
+	panic(fmt.Errorf("not implemented: GetAllItems - getAllItems"))
 }
 
 // GetItemByID is the resolver for the getItemById field.
 func (r *queryResolver) GetItemByID(ctx context.Context, id *string) (*model.Item, error) {
-	var Item services.Item
-	item, err := Item.GetItemById(ctx, int64(*id))
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return item, err
+	panic(fmt.Errorf("not implemented: GetItemByID - getItemById"))
 }
 
 // GetTopItems is the resolver for the getTopItems field.
 func (r *queryResolver) GetTopItems(ctx context.Context) ([]*model.Item, error) {
-	var Item services.Item
-	var resItems []*model.Item
-	dbItems, err := Item.GetTopItems(ctx)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	for _, item := range dbItems {
-		resItems = append(resItems, &model.Item{ID: item.ID, Name: item.Name, Price: item.Price, Qty: item.Qty, Category: item.Category, Promotion: item.Promotion, TotalSalesItem: item.TotalSalesItem, Aisle: item.Aisle, DepartmentID: item.DepartmentID})
-	}
-
-	return resItems, nil
+	panic(fmt.Errorf("not implemented: GetTopItems - getTopItems"))
 }
 
 // GetItemsByCategory is the resolver for the getItemsByCategory field.
 func (r *queryResolver) GetItemsByCategory(ctx context.Context, category *string) ([]*model.Item, error) {
-	var Item services.Item
-	var resItems []*model.Item
-	dbItems, err := Item.GetItemsByCategory(ctx, category)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	for _, item := range dbItems {
-		resItems = append(resItems, &model.Item{ID: item.ID, Name: item.Name, Price: item.Price, Qty: item.Qty, Category: item.Category, Promotion: item.Promotion, TotalSalesItem: item.TotalSalesItem, Aisle: item.Aisle, DepartmentID: item.DepartmentID})
-	}
-
-	return resItems, nil
+	panic(fmt.Errorf("not implemented: GetItemsByCategory - getItemsByCategory"))
 }
 
 // GetAllDepartments is the resolver for the getAllDepartments field.
 func (r *queryResolver) GetAllDepartments(ctx context.Context) ([]*model.Department, error) {
-	var Department services.Department
-	var resDepartments []*model.Department
-	dbDepartments, err := Department.GetAllDepartments(ctx)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	for _, department := range dbDepartments {
-		resDepartments = append(resDepartments, &model.Department{ID: department.ID, Name: department.Name, TotalSalesDept: department.TotalSalesDept, CreatedAt: department.CreatedAt, UpdatedAt: department.UpdatedAt})
-	}
-
-	return resDepartments, nil
+	panic(fmt.Errorf("not implemented: GetAllDepartments - getAllDepartments"))
 }
 
 // GetDepartmentByID is the resolver for the getDepartmentById field.
 func (r *queryResolver) GetDepartmentByID(ctx context.Context, id *string) (*model.Department, error) {
-	var Department services.Department
-	department, err := Department.GetDepartmentById(ctx, int64(*id))
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return department, err
+	panic(fmt.Errorf("not implemented: GetDepartmentByID - getDepartmentById"))
 }
 
 // GetTopDepartments is the resolver for the getTopDepartments field.
 func (r *queryResolver) GetTopDepartments(ctx context.Context) ([]*model.Department, error) {
-	var Department services.Department
-	var resDepartments []*model.Department
-	dbDepartments, err := Department.GetTopDepartments(ctx)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	for _, department := range dbDepartments {
-		resDepartments = append(resDepartments, &model.Department{ID: department.ID, Name: department.Name, TotalSalesDept: department.TotalSalesDept, CreatedAt: department.CreatedAt, UpdatedAt: department.UpdatedAt})
-	}
-
-	return resDepartments, nil
+	panic(fmt.Errorf("not implemented: GetTopDepartments - getTopDepartments"))
 }
 
 // GetAllManagers is the resolver for the getAllManagers field.
 func (r *queryResolver) GetAllManagers(ctx context.Context) ([]*model.Manager, error) {
-	var Manager services.Manager
-	var resManagers []*model.Manager
-	dbManagers, err := Manager.GetAllManagers(ctx)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	for _, manager := range dbManagers {
-		resManagers = append(resManagers, &model.Manager{ID: manager.ID, FirstName: manager.FirstName, LastName: manager.LastName, DepartmentID: manager.DepartmentID, CreatedAt: manager.CreatedAt, UpdatedAt: manager.UpdatedAt})
-	}
-
-	return resManagers, nil
+	panic(fmt.Errorf("not implemented: GetAllManagers - getAllManagers"))
 }
 
 // GetManagerByID is the resolver for the getManagerById field.
 func (r *queryResolver) GetManagerByID(ctx context.Context, id *string) (*model.Manager, error) {
-	var Manager services.Manager
-	manager, err := Manager.GetManagerById(ctx, int64(*id))
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return manager, err
+	panic(fmt.Errorf("not implemented: GetManagerByID - getManagerById"))
 }
 
 // Mutation returns MutationResolver implementation.
@@ -294,19 +194,3 @@ func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
-
-// !!! WARNING !!!
-// The code below was going to be deleted when updating resolvers. It has been copied here so you have
-// one last chance to move it out of harms way if you want. There are two reasons this happens:
-//   - When renaming or deleting a resolver the old code will be put in here. You can safely delete
-//     it when you're done.
-//   - You have helper methods in this file. Move them out to keep these resolver files clean.
-func (r *mutationResolver) SetSaleItem(ctx context.Context, input *model.ItemPromotion) (*model.Item, error) {
-	var Item services.Item
-	id, err := Item.SetSaleItem(ctx, input)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return &model.Item{ID: int(id), Price: input.Price}, nil
-}

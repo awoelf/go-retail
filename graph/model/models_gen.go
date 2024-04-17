@@ -6,24 +6,24 @@ type Department struct {
 	ID             string   `json:"id"`
 	Name           string   `json:"name"`
 	TotalSalesDept *float64 `json:"totalSalesDept,omitempty"`
-	CreatedAt      string   `json:"createdAt"`
-	UpdatedAt      string   `json:"updatedAt"`
+	CreatedAt      *string  `json:"createdAt,omitempty"`
+	UpdatedAt      *string  `json:"updatedAt,omitempty"`
 }
 
 type Item struct {
-	ID             string  `json:"id"`
-	DepartmentID   string  `json:"departmentId"`
-	Name           string  `json:"name"`
-	Price          float64 `json:"price"`
-	Qty            int     `json:"qty"`
-	QtySold        int     `json:"qtySold"`
-	Category       string  `json:"category"`
-	Promo          bool    `json:"promo"`
-	PromoPrice     float64 `json:"promoPrice"`
-	TotalSalesItem float64 `json:"totalSalesItem"`
-	Aisle          string  `json:"aisle"`
-	CreatedAt      string  `json:"createdAt"`
-	UpdatedAt      string  `json:"updatedAt"`
+	ID             string   `json:"id"`
+	DepartmentID   string   `json:"departmentId"`
+	Name           string   `json:"name"`
+	Price          float64  `json:"price"`
+	Qty            int      `json:"qty"`
+	QtySold        *int     `json:"qtySold,omitempty"`
+	Category       *string  `json:"category,omitempty"`
+	Promo          *bool    `json:"promo,omitempty"`
+	PromoPrice     *float64 `json:"promoPrice,omitempty"`
+	TotalSalesItem *float64 `json:"totalSalesItem,omitempty"`
+	Aisle          string   `json:"aisle"`
+	CreatedAt      *string  `json:"createdAt,omitempty"`
+	UpdatedAt      *string  `json:"updatedAt,omitempty"`
 }
 
 type ItemOrder struct {
@@ -47,8 +47,8 @@ type Manager struct {
 	DepartmentID *string `json:"departmentId,omitempty"`
 	FirstName    string  `json:"firstName"`
 	LastName     string  `json:"lastName"`
-	CreatedAt    string  `json:"createdAt"`
-	UpdatedAt    string  `json:"updatedAt"`
+	CreatedAt    *string `json:"createdAt,omitempty"`
+	UpdatedAt    *string `json:"updatedAt,omitempty"`
 }
 
 type Mutation struct {
@@ -59,12 +59,16 @@ type NewDepartment struct {
 }
 
 type NewItem struct {
-	DepartmentID string  `json:"departmentId"`
-	Name         string  `json:"name"`
-	Price        float64 `json:"price"`
-	Qty          int     `json:"qty"`
-	Category     string  `json:"category"`
-	Aisle        string  `json:"aisle"`
+	DepartmentID   string   `json:"departmentId"`
+	Name           string   `json:"name"`
+	Price          float64  `json:"price"`
+	Qty            int      `json:"qty"`
+	QtySold        *int     `json:"qtySold,omitempty"`
+	Category       *string  `json:"category,omitempty"`
+	Promo          *bool    `json:"promo,omitempty"`
+	PromoPrice     *float64 `json:"promoPrice,omitempty"`
+	TotalSalesItem *float64 `json:"totalSalesItem,omitempty"`
+	Aisle          string   `json:"aisle"`
 }
 
 type NewManager struct {

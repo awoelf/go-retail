@@ -159,13 +159,13 @@ func (i *Item) UpdateItem(ctx context.Context, input *model.UpdateItem) (*model.
 	return input, nil
 }
 
-func (i *Item) DeleteItem(ctx context.Context, id string) error {
+func (i *Item) DeleteItem(ctx context.Context, id *string) error {
 	ctx, cancel := context.WithTimeout(ctx, Timeout)
 	defer cancel()
 
 	query := `DELETE FROM Items WHERE ID = ?`
 
-	_, err := db.ExecContext(ctx, query, id)
+	_, err := db.ExecContext(ctx, query, &id)
 	if err != nil {
 		return err
 	}
