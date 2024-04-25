@@ -84,7 +84,7 @@ func (i *Item) GetAllItems(ctx context.Context) ([]*model.Item, error) {
 	return items, nil
 }
 
-func (i *Item) GetItemById(ctx context.Context, id string) (*model.Item, error) {
+func (i *Item) GetItemById(ctx context.Context, id *string) (*model.Item, error) {
 	ctx, cancel := context.WithTimeout(ctx, Timeout)
 	defer cancel()
 

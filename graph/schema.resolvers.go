@@ -103,12 +103,26 @@ func (r *mutationResolver) OrderItems(ctx context.Context, input *model.ItemOrde
 
 // StartSaleItem is the resolver for the startSaleItem field.
 func (r *mutationResolver) StartSaleItem(ctx context.Context, input *model.ItemPromotion) (*model.Item, error) {
-	panic(fmt.Errorf("not implemented: StartSaleItem - startSaleItem"))
+	res, err := r.Services.Item.StartSaleItem(ctx, input)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return &model.Item{
+		ID:         res.ID,
+		Promo:      &res.Promo,
+		PromoPrice: &res.PromoPrice,
+	}, nil
 }
 
 // EndSaleItem is the resolver for the endSaleItem field.
 func (r *mutationResolver) EndSaleItem(ctx context.Context, input *string) (*string, error) {
-	panic(fmt.Errorf("not implemented: EndSaleItem - endSaleItem"))
+	_, err := r.Services.Item.EndSaleItem(ctx, input)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return input, nil
 }
 
 // AddDepartment is the resolver for the addDepartment field.
@@ -143,22 +157,42 @@ func (r *mutationResolver) DeleteManager(ctx context.Context, id *string) (*stri
 
 // GetAllItems is the resolver for the getAllItems field.
 func (r *queryResolver) GetAllItems(ctx context.Context) ([]*model.Item, error) {
-	panic(fmt.Errorf("not implemented: GetAllItems - getAllItems"))
+	res, err := r.Services.Item.GetAllItems(ctx)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return res, nil
 }
 
 // GetItemByID is the resolver for the getItemById field.
 func (r *queryResolver) GetItemByID(ctx context.Context, id *string) (*model.Item, error) {
-	panic(fmt.Errorf("not implemented: GetItemByID - getItemById"))
+	res, err := r.Services.Item.GetItemById(ctx, id)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return res, nil
 }
 
 // GetTopItems is the resolver for the getTopItems field.
 func (r *queryResolver) GetTopItems(ctx context.Context) ([]*model.Item, error) {
-	panic(fmt.Errorf("not implemented: GetTopItems - getTopItems"))
+	res, err := r.Services.Item.GetTopItems(ctx)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return res, nil
 }
 
 // GetItemsByCategory is the resolver for the getItemsByCategory field.
 func (r *queryResolver) GetItemsByCategory(ctx context.Context, category *string) ([]*model.Item, error) {
-	panic(fmt.Errorf("not implemented: GetItemsByCategory - getItemsByCategory"))
+	res, err := r.Services.Item.GetItemsByCategory(ctx, category)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return res, nil
 }
 
 // GetAllDepartments is the resolver for the getAllDepartments field.
