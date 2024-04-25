@@ -38,8 +38,8 @@ type ItemPromotion struct {
 }
 
 type ItemTransaction struct {
-	ID             string `json:"id"`
-	QtyTransaction int    `json:"qtyTransaction"`
+	ID  string `json:"id"`
+	Qty int    `json:"qty"`
 }
 
 type Manager struct {
@@ -78,6 +78,14 @@ type NewManager struct {
 }
 
 type Query struct {
+}
+
+type Transaction struct {
+	ID        string             `json:"id"`
+	Items     []*ItemTransaction `json:"items"`
+	QtyItems  int                `json:"qtyItems"`
+	TotalCost float64            `json:"totalCost"`
+	Time      string             `json:"time"`
 }
 
 type UpdateDepartment struct {

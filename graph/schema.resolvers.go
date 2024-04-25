@@ -64,30 +64,6 @@ func (r *mutationResolver) DeleteItem(ctx context.Context, id *string) (*string,
 	return id, nil
 }
 
-// SellItem is the resolver for the sellItem field.
-func (r *mutationResolver) SellItem(ctx context.Context, input *model.ItemTransaction) (*model.Item, error) {
-	res, err := r.Services.Item.SellItem(ctx, input)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return &model.Item{
-		ID: res.ID,
-	}, nil
-}
-
-// ReturnItem is the resolver for the returnItem field.
-func (r *mutationResolver) ReturnItem(ctx context.Context, input *model.ItemTransaction) (*model.Item, error) {
-	res, err := r.Services.Item.ReturnItem(ctx, input)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return &model.Item{
-		ID: res.ID,
-	}, nil
-}
-
 // OrderItems is the resolver for the orderItems field.
 func (r *mutationResolver) OrderItems(ctx context.Context, input *model.ItemOrder) (*model.Item, error) {
 	res, err := r.Services.Item.OrderItems(ctx, input)
@@ -166,8 +142,8 @@ func (r *mutationResolver) AddManager(ctx context.Context, input *model.NewManag
 	}
 
 	return &model.Manager{
-		FirstName: res.FirstName,
-		LastName: res.LastName,
+		FirstName:    res.FirstName,
+		LastName:     res.LastName,
 		DepartmentID: &res.DepartmentID,
 	}, nil
 }
@@ -180,9 +156,9 @@ func (r *mutationResolver) UpdateManager(ctx context.Context, input *model.Updat
 	}
 
 	return &model.Manager{
-		ID: res.ID,
-		FirstName: res.FirstName,
-		LastName: res.LastName,
+		ID:           res.ID,
+		FirstName:    res.FirstName,
+		LastName:     res.LastName,
 		DepartmentID: &res.DepartmentID,
 	}, nil
 }
@@ -298,3 +274,30 @@ func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
+
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//   - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//     it when you're done.
+//   - You have helper methods in this file. Move them out to keep these resolver files clean.
+func (r *mutationResolver) SellItem(ctx context.Context, input *model.ItemTransaction) (*model.Item, error) {
+	res, err := r.Services.Item.SellItem(ctx, input)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return &model.Item{
+		ID: res.ID,
+	}, nil
+}
+func (r *mutationResolver) ReturnItem(ctx context.Context, input *model.ItemTransaction) (*model.Item, error) {
+	res, err := r.Services.Item.ReturnItem(ctx, input)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return &model.Item{
+		ID: res.ID,
+	}, nil
+}

@@ -37,6 +37,20 @@ type Item {
 	updatedAt: String
 }
 
+
+type ItemTransaction {
+	id: ID!
+	qty: Int!
+}
+
+type Transaction {
+	id: ID!
+	items: [ItemTransaction]!
+	qtyItems: Int!
+	totalCost: Float!
+	time: String!
+}
+
 input NewItem {
 	departmentId: ID! # FK
 	name: String!
@@ -62,11 +76,6 @@ input UpdateItem {
 	promoPrice: Float
 	totalSalesItem: Float
 	aisle: String
-}
-
-input ItemTransaction {
-	id: ID!
-	qtyTransaction: Int!
 }
 
 input ItemOrder {
@@ -118,8 +127,8 @@ type Mutation {
 	addItem(input: NewItem): Item
 	updateItem(input: UpdateItem): Item
 	deleteItem(id: ID): ID
-	sellItem(input: ItemTransaction): Item
-	returnItem(input: ItemTransaction): Item
+	# sellItem(input: ItemTransaction): Item
+	# returnItem(input: ItemTransaction): Item
 	orderItems(input: ItemOrder): Item
 	startSaleItem(input: ItemPromotion): Item
 	endSaleItem(input: ID): ID
