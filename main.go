@@ -2,7 +2,6 @@ package main
 
 import (
 	"log"
-	"net/http"
 	"os"
 
 	"github.com/99designs/gqlgen/graphql/handler"
@@ -11,6 +10,7 @@ import (
 	"github.com/awoelf/go-retail/graph"
 	"github.com/awoelf/go-retail/services"
 	"github.com/joho/godotenv"
+	"github.com/gin-gonic/gin"
 )
 
 type Config struct {
@@ -28,14 +28,30 @@ func loadEnv() {
 	}
 }
 
+func graphqlHandler() gin.HandlerFunc {
+	// NewExecutableSchema and Config are in the generated.go file
+	// Resolver is in the resolver.go file
+	h := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{}}))
+
+	return func(c *gin.Context) {
+		h.ServeHTTP(c.Writer, c.Request)
+	}
+}
+
+// Defining the Playground handler
+func playgroundHandler() gin.HandlerFunc {
+	h := playground.Handler("GraphQL", "/query")
+
+	return func(c *gin.Context) {
+		h.ServeHTTP(c.Writer, c.Request)
+	}
+}
+
 func (app *Application) Serve() error {
-	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{}}))
-
-	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
-	http.Handle("/query", srv)
-
-	log.Printf("Connect to http://localhost:%s/ for GraphQL playground", app.Config.Port)
-	return http.ListenAndServe(":"+app.Config.Port, nil)
+	r := gin.Default()
+	r.POST("/query", graphqlHandler())
+	r.GET("/", playgroundHandler())
+	return r.Run(":"+app.Config.Port)
 }
 
 func main() {
