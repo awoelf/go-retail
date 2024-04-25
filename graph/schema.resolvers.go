@@ -127,17 +127,36 @@ func (r *mutationResolver) EndSaleItem(ctx context.Context, input *string) (*str
 
 // AddDepartment is the resolver for the addDepartment field.
 func (r *mutationResolver) AddDepartment(ctx context.Context, input *model.NewDepartment) (*model.Department, error) {
-	panic(fmt.Errorf("not implemented: AddDepartment - addDepartment"))
+	res, err := r.Services.Department.AddDepartment(ctx, input)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return &model.Department{
+		Name: res.Name,
+	}, nil
 }
 
 // UpdateDepartment is the resolver for the updateDepartment field.
 func (r *mutationResolver) UpdateDepartment(ctx context.Context, input *model.UpdateDepartment) (*model.Department, error) {
-	panic(fmt.Errorf("not implemented: UpdateDepartment - updateDepartment"))
+	res, err := r.Services.Department.UpdateDepartment(ctx, input)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return &model.Department{
+		Name: res.Name,
+	}, nil
 }
 
 // DeleteDepartment is the resolver for the deleteDepartment field.
 func (r *mutationResolver) DeleteDepartment(ctx context.Context, id *string) (*string, error) {
-	panic(fmt.Errorf("not implemented: DeleteDepartment - deleteDepartment"))
+	err := r.Services.Department.DeleteDepartment(ctx, id)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return id, nil
 }
 
 // AddManager is the resolver for the addManager field.
@@ -197,17 +216,35 @@ func (r *queryResolver) GetItemsByCategory(ctx context.Context, category *string
 
 // GetAllDepartments is the resolver for the getAllDepartments field.
 func (r *queryResolver) GetAllDepartments(ctx context.Context) ([]*model.Department, error) {
-	panic(fmt.Errorf("not implemented: GetAllDepartments - getAllDepartments"))
+	res, err := r.Services.Department.GetAllDepartments(ctx)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return res, nil
 }
 
 // GetDepartmentByID is the resolver for the getDepartmentById field.
 func (r *queryResolver) GetDepartmentByID(ctx context.Context, id *string) (*model.Department, error) {
-	panic(fmt.Errorf("not implemented: GetDepartmentByID - getDepartmentById"))
+	res, err := r.Services.Department.GetDepartmentById(ctx, id)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return res, nil
 }
 
 // GetTopDepartments is the resolver for the getTopDepartments field.
 func (r *queryResolver) GetTopDepartments(ctx context.Context) ([]*model.Department, error) {
-	panic(fmt.Errorf("not implemented: GetTopDepartments - getTopDepartments"))
+	res, err := r.Services.Department.GetTopDepartments(ctx)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return res, nil
 }
 
 // GetAllManagers is the resolver for the getAllManagers field.

@@ -2,7 +2,7 @@ package services
 
 import (
 	"context"
-	"log"
+	"time"
 
 	"github.com/awoelf/go-retail/graph/model"
 )
@@ -11,44 +11,50 @@ type Department struct {
 	model.Department
 }
 
-func (d *Department) AddDepartment(ctx context.Context, input *model.NewDepartment) (int64, error) {
-	stmt, err := db.Prepare("INSERT INTO Departments(Name) VALUES(?)")
+func (d *Department) AddDepartment(ctx context.Context, input *model.NewDepartment) (*model.NewDepartment, error) {
+	ctx, cancel := context.WithTimeout(ctx, Timeout)
+	defer cancel()
+	
+	query := `
+		INSERT INTO Departments(
+			Name
+			CreatedAt
+			UpdatedAt
+		) 
+		VALUES($1, $2, $2)
+	`
+
+	_, err := db.ExecContext(ctx, query, input.Name, time.Now())
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
-	res, err := stmt.ExecContext(ctx, input.Name)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	id, err := res.LastInsertId()
-	if err != nil {
-		log.Fatal("Error:", err.Error())
-	}
-
-	return id, nil
+	return input, nil
 }
 
 func (d *Department) GetAllDepartments(ctx context.Context) ([]*model.Department, error) {
-	stmt, err := db.Prepare("SELECT * FROM Departments")
-	if err != nil {
-		log.Fatal(err)
-	}
+	ctx, cancel := context.WithTimeout(ctx, Timeout)
+	defer cancel()
+	
+	query := `SELECT * FROM Departments ORDER BY ID`
 
-	res, err := stmt.QueryContext(ctx)
+	rows, err := db.QueryContext(ctx, query)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
-	defer res.Close()
-
+	
 	var departments []*model.Department
-
-	for res.Next() {
+	for rows.Next() {
 		var department model.Department
-		err := res.Scan(&department.ID, &department.Name, &department.TotalSalesDept, &department.CreatedAt, &department.UpdatedAt)
+		err := rows.Scan(
+			&department.ID, 
+			&department.Name, 
+			&department.TotalSalesDept, 
+			&department.CreatedAt, 
+			&department.UpdatedAt,
+		)
 		if err != nil {
-			log.Fatal(err)
+			return nil, err
 		}
 		departments = append(departments, &department)
 	}
@@ -56,84 +62,89 @@ func (d *Department) GetAllDepartments(ctx context.Context) ([]*model.Department
 	return departments, nil
 }
 
-func (d *Department) GetDepartmentById(ctx context.Context, id int64) (*model.Department, error) {
-	stmt, err := db.Prepare("SELECT * FROM Departments WHERE ID = ?")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	res, err := stmt.QueryContext(ctx, id)
-	if err != nil {
-		log.Fatal(err)
-	}
+func (d *Department) GetDepartmentById(ctx context.Context, id *string) (*model.Department, error) {
+	ctx, cancel := context.WithTimeout(ctx, Timeout)
+	defer cancel()
 	
-	defer res.Close()
+	query := `SELECT * FROM Departments WHERE ID = $1`
+
+	row, err := db.QueryContext(ctx, query, id)
+	if err != nil {
+		return nil, err
+	}
 
 	var department model.Department
-
-	for res.Next() {
-		err = res.Scan(&department.ID, &department.Name, &department.TotalSalesDept, &department.CreatedAt, &department.UpdatedAt)
-		if err != nil {
-			log.Fatal(err)
-		}
+	err = row.Scan(
+		&department.ID, 
+		&department.Name, 
+		&department.TotalSalesDept, 
+		&department.CreatedAt, 
+		&department.UpdatedAt,
+	)
+	if err != nil {
+		return nil, err
 	}
-
+	
 	return &department, nil
 }
 
-func (d *Department) UpdateDepartment(ctx context.Context, input *model.UpdateDepartment) (int64, error) {
-	stmt, err := db.Prepare("UPDATE Departments SET Name = ?, TotalSalesDept = ?, UpdatedAt = NOW() WHERE ID = ?")
+func (d *Department) UpdateDepartment(ctx context.Context, input *model.UpdateDepartment) (*model.UpdateDepartment, error) {
+	ctx, cancel := context.WithTimeout(ctx, Timeout)
+	defer cancel()
+	
+	query := `
+		UPDATE Departments 
+		SET 
+			Name = $1, 
+			UpdatedAt = $2 
+		WHERE ID = $3
+	`
+
+	_, err := db.ExecContext(ctx, query, input.Name, time.Now(), input.ID)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
-	res, err := stmt.ExecContext(ctx, input.Name, input.ID)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	id, err := res.LastInsertId()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return id, nil
+	return input, nil
 }
 
-func (d *Department) DeleteDepartment(ctx context.Context, id int64) (error) {
-	stmt, err := db.Prepare("DELETE FROM Departments WHERE ID = ?")
-	if err != nil {
-		log.Fatal(err)
-	}
+func (d *Department) DeleteDepartment(ctx context.Context, id *string) (error) {
+	ctx, cancel := context.WithTimeout(ctx, Timeout)
+	defer cancel()
+	
+	query := `DELETE FROM Departments WHERE ID = $1`
 
-	_, err = stmt.ExecContext(ctx, id)
+	_, err := db.ExecContext(ctx, query, id)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
-
 
 	return nil
 }
 
 func (d *Department) GetTopDepartments(ctx context.Context) ([]*model.Department, error) {
-	stmt, err := db.Prepare("SELECT * FROM Departments ORDER BY TotalSalesDept DESC")
-	if err != nil {
-		log.Fatal(err)
-	}
+	ctx, cancel := context.WithTimeout(ctx, Timeout)
+	defer cancel()
+	
+	query := `SELECT * FROM Departments ORDER BY TotalSalesDept DESC`
 
-	res, err := stmt.QueryContext(ctx)
+	rows, err := db.QueryContext(ctx, query)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
-	defer res.Close()
 
 	var departments []*model.Department
-
-	for res.Next() {
+	for rows.Next() {
 		var department model.Department
-		err := res.Scan(&department.ID, &department.Name, &department.TotalSalesDept, &department.CreatedAt, &department.UpdatedAt)
+		err := rows.Scan(
+			&department.ID, 
+			&department.Name, 
+			&department.TotalSalesDept, 
+			&department.CreatedAt, 
+			&department.UpdatedAt,
+		)
 		if err != nil {
-			log.Fatal(err)
+			return nil, err
 		}
 		departments = append(departments, &department)
 	}

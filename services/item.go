@@ -25,7 +25,8 @@ func (i *Item) AddItem(ctx context.Context, input *model.NewItem) (*model.NewIte
 			CreatedAt, 
 			UpdatedAt
 		) 
-		VALUES($1,$2,$3,$4,$5,$6,$7,$8) returning *`
+		VALUES($1,$2,$3,$4,$5,$6,$7,$7)
+	`
 
 	_, err := db.ExecContext(
 		ctx,
@@ -36,7 +37,6 @@ func (i *Item) AddItem(ctx context.Context, input *model.NewItem) (*model.NewIte
 		input.Qty,
 		input.Category,
 		input.Aisle,
-		time.Now(),
 		time.Now(),
 	)
 	if err != nil {
@@ -119,7 +119,8 @@ func (i *Item) UpdateItem(ctx context.Context, input *model.UpdateItem) (*model.
 	ctx, cancel := context.WithTimeout(ctx, Timeout)
 	defer cancel()
 
-	query := `UPDATE Items 
+	query := `
+		UPDATE Items 
 		SET 
 			Name = $1,
 			DepartmentID = $2,
@@ -133,7 +134,6 @@ func (i *Item) UpdateItem(ctx context.Context, input *model.UpdateItem) (*model.
 			Aisle = $10,
 			UpdatedAt = $11 
 		WHERE ID = $12
-		returning *
 	`
 
 	_, err := db.ExecContext(
@@ -165,7 +165,7 @@ func (i *Item) DeleteItem(ctx context.Context, id *string) error {
 
 	query := `DELETE FROM Items WHERE ID = ?`
 
-	_, err := db.ExecContext(ctx, query, &id)
+	_, err := db.ExecContext(ctx, query, id)
 	if err != nil {
 		return err
 	}
@@ -173,6 +173,7 @@ func (i *Item) DeleteItem(ctx context.Context, id *string) error {
 	return nil
 }
 
+// TODO: Move SellItem and ReturnItem to Transaction model
 func (i *Item) SellItem(ctx context.Context, input *model.ItemTransaction) (*model.ItemTransaction, error) {
 	ctx, cancel := context.WithTimeout(ctx, Timeout)
 	defer cancel()
