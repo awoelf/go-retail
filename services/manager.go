@@ -2,51 +2,60 @@ package services
 
 import (
 	"context"
-	"log"
+	"time"
 
 	"github.com/awoelf/go-retail/graph/model"
 )
 
 type Manager struct{}
 
-func (m *Manager) AddManager(ctx context.Context, input *model.NewManager) (int64, error) {
-	stmt, err := db.Prepare("INSERT INTO Managers(FirstName, LastName, DepartmentID) VALUES(?,?,?)")
+func (m *Manager) AddManager(ctx context.Context, input *model.NewManager) (*model.NewManager, error) {
+	ctx, cancel := context.WithTimeout(ctx, Timeout)
+	defer cancel()
+	
+	query := `
+		INSERT INTO Managers(
+			FirstName, 
+			LastName, 
+			DepartmentID,
+			CreatedAt,
+			UpdatedAt
+		) 
+		VALUES($1,$2,$3,$4,$4)
+	`
+
+	_, err := db.ExecContext(ctx, query, input.FirstName, input.LastName, input.DepartmentID, time.Now())
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
-	res, err := stmt.ExecContext(ctx, input.FirstName, input.LastName, input.DepartmentID)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	id, err := res.LastInsertId()
-	if err != nil {
-		log.Fatal("Error:", err.Error())
-	}
-
-	return id, nil
+	return input, nil
 }
 
 func (m *Manager) GetAllManagers(ctx context.Context) ([]*model.Manager, error) {
-	stmt, err := db.Prepare("SELECT * FROM Managers")
-	if err != nil {
-		log.Fatal(err)
-	}
+	ctx, cancel := context.WithTimeout(ctx, Timeout)
+	defer cancel()
+	
+	query := `SELECT * FROM Managers`
 
-	res, err := stmt.QueryContext(ctx)
+	rows, err := db.QueryContext(ctx, query)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
-	defer res.Close()
 
 	var managers []*model.Manager
-
-	for res.Next() {
+	for rows.Next() {
 		var manager model.Manager
-		err := res.Scan(&manager.ID, &manager.FirstName, &manager.LastName, &manager.DepartmentID, &manager.CreatedAt, &manager.UpdatedAt)
+		err := rows.Scan(
+			&manager.ID,
+			&manager.FirstName,
+			&manager.LastName,
+			&manager.DepartmentID,
+			&manager.CreatedAt,
+			&manager.UpdatedAt,
+		)
 		if err != nil {
-			log.Fatal(err)
+			return nil, err
 		}
 		managers = append(managers, &manager)
 	}
@@ -54,61 +63,73 @@ func (m *Manager) GetAllManagers(ctx context.Context) ([]*model.Manager, error) 
 	return managers, nil
 }
 
-func (m *Manager) GetManagerById(ctx context.Context, id int64) (*model.Manager, error) {
-	stmt, err := db.Prepare("SELECT * FROM Managers WHERE ID = ?")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	res, err := stmt.QueryContext(ctx, id)
-	if err != nil {
-		log.Fatal(err)
-	}
+func (m *Manager) GetManagerById(ctx context.Context, id *string) (*model.Manager, error) {
+	ctx, cancel := context.WithTimeout(ctx, Timeout)
+	defer cancel()
 	
-	defer res.Close()
+	query := `SELECT * FROM Managers WHERE ID = $1`
+
+	row, err := db.QueryContext(ctx, query, id)
+	if err != nil {
+		return nil, err
+	}
 
 	var manager model.Manager
-
-	for res.Next() {
-		err = res.Scan(&manager.ID, &manager.FirstName, &manager.LastName, &manager.DepartmentID, &manager.CreatedAt, &manager.UpdatedAt)
-		if err != nil {
-			log.Fatal(err)
-		}
+	err = row.Scan(
+		&manager.ID, 
+		&manager.FirstName, 
+		&manager.LastName, 
+		&manager.DepartmentID, 
+		&manager.CreatedAt, 
+		&manager.UpdatedAt,
+	)
+	if err != nil {
+		return nil, err
 	}
-
+	
 	return &manager, nil
 }
 
-func (m *Manager) UpdateManager(ctx context.Context, input *model.UpdateManager) (int64, error) {
-	stmt, err := db.Prepare("UPDATE Managers SET FirstName = ?, LastName = ?, DepartmentID = ?, UpdatedAt = NOW() WHERE ID = ?")
+func (m *Manager) UpdateManager(ctx context.Context, input *model.UpdateManager) (*model.UpdateManager, error) {
+	ctx, cancel := context.WithTimeout(ctx, Timeout)
+	defer cancel()
+	
+	query := `
+		UPDATE Managers 
+		SET 
+			FirstName = $1, 
+			LastName = $2, 
+			DepartmentID = $3, 
+			UpdatedAt = $4 
+		WHERE ID = $5
+	`
+
+	_, err := db.ExecContext(
+		ctx,
+		query,
+		input.FirstName, 
+		input.LastName, 
+		input.DepartmentID, 
+		time.Now(),
+		input.ID,
+	)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
-	res, err := stmt.ExecContext(ctx, input.FirstName, input.LastName, input.DepartmentID, input.ID)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	id, err := res.LastInsertId()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return id, nil
+	return input, nil
 }
 
-func (m *Manager) DeleteManager(ctx context.Context, id int64) (error) {
-	stmt, err := db.Prepare("DELETE FROM Managers WHERE ID = ?")
-	if err != nil {
-		log.Fatal(err)
-	}
+func (m *Manager) DeleteManager(ctx context.Context, id *string) (error) {
+	ctx, cancel := context.WithTimeout(ctx, Timeout)
+	defer cancel()
+	
+	query := `DELETE FROM Managers WHERE ID = $1`
 
-	_, err = stmt.ExecContext(ctx, id)
+	_, err := db.ExecContext(ctx, query, id)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
-
 
 	return nil
 }

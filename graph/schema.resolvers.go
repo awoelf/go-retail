@@ -6,7 +6,6 @@ package graph
 
 import (
 	"context"
-	"fmt"
 	"log"
 
 	"github.com/awoelf/go-retail/graph/model"
@@ -161,17 +160,41 @@ func (r *mutationResolver) DeleteDepartment(ctx context.Context, id *string) (*s
 
 // AddManager is the resolver for the addManager field.
 func (r *mutationResolver) AddManager(ctx context.Context, input *model.NewManager) (*model.Manager, error) {
-	panic(fmt.Errorf("not implemented: AddManager - addManager"))
+	res, err := r.Services.Manager.AddManager(ctx, input)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return &model.Manager{
+		FirstName: res.FirstName,
+		LastName: res.LastName,
+		DepartmentID: &res.DepartmentID,
+	}, nil
 }
 
 // UpdateManager is the resolver for the updateManager field.
 func (r *mutationResolver) UpdateManager(ctx context.Context, input *model.UpdateManager) (*model.Manager, error) {
-	panic(fmt.Errorf("not implemented: UpdateManager - updateManager"))
+	res, err := r.Services.Manager.UpdateManager(ctx, input)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return &model.Manager{
+		ID: res.ID,
+		FirstName: res.FirstName,
+		LastName: res.LastName,
+		DepartmentID: &res.DepartmentID,
+	}, nil
 }
 
 // DeleteManager is the resolver for the deleteManager field.
 func (r *mutationResolver) DeleteManager(ctx context.Context, id *string) (*string, error) {
-	panic(fmt.Errorf("not implemented: DeleteManager - deleteManager"))
+	err := r.Services.Manager.DeleteManager(ctx, id)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return id, nil
 }
 
 // GetAllItems is the resolver for the getAllItems field.
@@ -249,12 +272,22 @@ func (r *queryResolver) GetTopDepartments(ctx context.Context) ([]*model.Departm
 
 // GetAllManagers is the resolver for the getAllManagers field.
 func (r *queryResolver) GetAllManagers(ctx context.Context) ([]*model.Manager, error) {
-	panic(fmt.Errorf("not implemented: GetAllManagers - getAllManagers"))
+	res, err := r.Services.Manager.GetAllManagers(ctx)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return res, nil
 }
 
 // GetManagerByID is the resolver for the getManagerById field.
 func (r *queryResolver) GetManagerByID(ctx context.Context, id *string) (*model.Manager, error) {
-	panic(fmt.Errorf("not implemented: GetManagerByID - getManagerById"))
+	res, err := r.Services.Manager.GetManagerById(ctx, id)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return res, nil
 }
 
 // Mutation returns MutationResolver implementation.
