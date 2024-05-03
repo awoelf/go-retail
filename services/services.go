@@ -12,6 +12,7 @@ type Services struct {
 	Item Item
 	Manager Manager
 	Department Department
+	Transaction Transaction
 }
 
 func Register(dbPool *sql.DB) Services{

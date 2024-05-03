@@ -32,3 +32,14 @@ CREATE TABLE IF NOT EXISTS items (
 	"createdAt" TIMESTAMP DEFAULT NOW(),
 	"updatedAt" TIMESTAMP DEFAULT NOW()
 );
+
+CREATE TABLE IF NOT EXISTS transactions (
+	"id" uuid PRIMARY KEY NOT NULL DEFAULT uuid_generate_v4(),
+	"paymentMethod" TEXT NOT NULL,
+	"qtyItems" INT NOT NULL DEFAULT 0,
+	"totalCost" FLOAT NOT NULL DEFAULT 0,
+	"savings" FLOAT NOT NULL DEFAULT 0,
+	"status" TEXT NOT NULL,
+	"createdAt" TIMESTAMP DEFAULT NOW(),
+	"updatedAt" TIMESTAMP DEFAULT NOW()
+)

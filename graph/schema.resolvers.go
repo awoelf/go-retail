@@ -6,6 +6,7 @@ package graph
 
 import (
 	"context"
+	"fmt"
 	"log"
 
 	"github.com/awoelf/go-retail/graph/model"
@@ -62,6 +63,16 @@ func (r *mutationResolver) DeleteItem(ctx context.Context, id *string) (*string,
 	}
 
 	return id, nil
+}
+
+// SellTransaction is the resolver for the sellTransaction field.
+func (r *mutationResolver) SellTransaction(ctx context.Context, input *model.NewTransaction) (*model.Transaction, error) {
+	panic(fmt.Errorf("not implemented: SellTransaction - sellTransaction"))
+}
+
+// ReturnTransaction is the resolver for the returnTransaction field.
+func (r *mutationResolver) ReturnTransaction(ctx context.Context, input *model.NewTransaction) (*model.Transaction, error) {
+	panic(fmt.Errorf("not implemented: ReturnTransaction - returnTransaction"))
 }
 
 // OrderItems is the resolver for the orderItems field.
@@ -274,30 +285,3 @@ func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
-
-// !!! WARNING !!!
-// The code below was going to be deleted when updating resolvers. It has been copied here so you have
-// one last chance to move it out of harms way if you want. There are two reasons this happens:
-//   - When renaming or deleting a resolver the old code will be put in here. You can safely delete
-//     it when you're done.
-//   - You have helper methods in this file. Move them out to keep these resolver files clean.
-func (r *mutationResolver) SellItem(ctx context.Context, input *model.ItemTransaction) (*model.Item, error) {
-	res, err := r.Services.Item.SellItem(ctx, input)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return &model.Item{
-		ID: res.ID,
-	}, nil
-}
-func (r *mutationResolver) ReturnItem(ctx context.Context, input *model.ItemTransaction) (*model.Item, error) {
-	res, err := r.Services.Item.ReturnItem(ctx, input)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return &model.Item{
-		ID: res.ID,
-	}, nil
-}

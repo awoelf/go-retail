@@ -15,7 +15,7 @@ func (i *Item) AddItem(ctx context.Context, input *model.NewItem) (*model.NewIte
 	defer cancel()
 
 	query := `
-		INSERT INTO Items(
+		INSERT INTO items(
 			DepartmentID, 
 			Name, 
 			Price, 
@@ -50,7 +50,7 @@ func (i *Item) GetAllItems(ctx context.Context) ([]*model.Item, error) {
 	ctx, cancel := context.WithTimeout(ctx, Timeout)
 	defer cancel()
 
-	query := `SELECT * FROM Items ORDER BY ID`
+	query := `SELECT * FROM items ORDER BY ID`
 
 	rows, err := db.QueryContext(ctx, query)
 	if err != nil {
@@ -88,7 +88,7 @@ func (i *Item) GetItemById(ctx context.Context, id *string) (*model.Item, error)
 	ctx, cancel := context.WithTimeout(ctx, Timeout)
 	defer cancel()
 
-	query := `SELECT * FROM Items WHERE ID = $1`
+	query := `SELECT * FROM items WHERE ID = $1`
 
 	row := db.QueryRowContext(ctx, query, id)
 
@@ -120,7 +120,7 @@ func (i *Item) UpdateItem(ctx context.Context, input *model.UpdateItem) (*model.
 	defer cancel()
 
 	query := `
-		UPDATE Items 
+		UPDATE items 
 		SET 
 			Name = $1,
 			DepartmentID = $2,
@@ -163,7 +163,7 @@ func (i *Item) DeleteItem(ctx context.Context, id *string) error {
 	ctx, cancel := context.WithTimeout(ctx, Timeout)
 	defer cancel()
 
-	query := `DELETE FROM Items WHERE ID = ?`
+	query := `DELETE FROM items WHERE ID = ?`
 
 	_, err := db.ExecContext(ctx, query, id)
 	if err != nil {
@@ -173,50 +173,11 @@ func (i *Item) DeleteItem(ctx context.Context, id *string) error {
 	return nil
 }
 
-// TODO: Move SellItem and ReturnItem to Transaction model
-func (i *Item) SellItem(ctx context.Context, input *model.ItemTransaction) (*model.ItemTransaction, error) {
-	ctx, cancel := context.WithTimeout(ctx, Timeout)
-	defer cancel()
-
-	query := `UPDATE Items SET 
-		Qty = (Qty - $1), 
-		QtySold = (QtySold + $1),
-		UpdatedAt = $2
-		WHERE ID = $3
-	`
-
-	_, err := db.ExecContext(ctx, query, input.QtyTransaction, time.Now(), input.ID)
-	if err != nil {
-		return nil, err
-	}
-
-	return input, nil
-}
-
-func (i *Item) ReturnItem(ctx context.Context, input *model.ItemTransaction) (*model.ItemTransaction, error) {
-	ctx, cancel := context.WithTimeout(ctx, Timeout)
-	defer cancel()
-
-	query := `UPDATE Items SET 
-		Qty = (Qty + $1), 
-		QtySold = (QtySold - $1),
-		UpdatedAt = $2
-		WHERE ID = $3
-	`
-
-	_, err := db.ExecContext(ctx, query, input.QtyTransaction, time.Now(), input.ID)
-	if err != nil {
-		return nil, err
-	}
-
-	return input, nil
-}
-
 func (i *Item) OrderItems(ctx context.Context, input *model.ItemOrder) (*model.ItemOrder, error) {
 	ctx, cancel := context.WithTimeout(ctx, Timeout)
 	defer cancel()
 
-	query := `UPDATE Items SET Qty = (Qty + $1), UpdatedAt = $2 WHERE ID = $3`
+	query := `UPDATE items SET Qty = (Qty + $1), UpdatedAt = $2 WHERE ID = $3`
 
 	_, err := db.ExecContext(ctx, query, input.QtyOrder, time.Now(), input.ID)
 	if err != nil {
@@ -230,7 +191,7 @@ func (i *Item) GetTopItems(ctx context.Context) ([]*model.Item, error) {
 	ctx, cancel := context.WithTimeout(ctx, Timeout)
 	defer cancel()
 
-	query := `SELECT * FROM Items ORDER BY QtySold DESC`
+	query := `SELECT * FROM items ORDER BY QtySold DESC`
 
 	rows, err := db.QueryContext(ctx, query)
 	if err != nil {
@@ -268,7 +229,7 @@ func (i *Item) GetItemsByCategory(ctx context.Context, category *string) ([]*mod
 	ctx, cancel := context.WithTimeout(ctx, Timeout)
 	defer cancel()
 
-	query := `SELECT * FROM Items WHERE Category = $1`
+	query := `SELECT * FROM items WHERE Category = $1`
 
 	rows, err := db.QueryContext(ctx, query, category)
 	if err != nil {
@@ -306,7 +267,7 @@ func (i *Item) StartSaleItem(ctx context.Context, input *model.ItemPromotion) (*
 	ctx, cancel := context.WithTimeout(ctx, Timeout)
 	defer cancel()
 
-	query := `UPDATE Items SET Promo = $1, PromoPrice = $2 WHERE ID = $3`
+	query := `UPDATE items SET Promo = $1, PromoPrice = $2 WHERE ID = $3`
 
 	_, err := db.ExecContext(ctx, query, input.Promo, input.PromoPrice, input.ID)
 	if err != nil {
@@ -320,7 +281,7 @@ func (i *Item) EndSaleItem(ctx context.Context, id *string) (*string, error) {
 	ctx, cancel := context.WithTimeout(ctx, Timeout)
 	defer cancel()
 
-	query := `UPDATE Items SET Promotion = false WHERE ID = $1`
+	query := `UPDATE items SET Promotion = false WHERE ID = $1`
 
 	_, err := db.ExecContext(ctx, query, id)
 	if err != nil {

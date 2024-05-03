@@ -38,8 +38,8 @@ type ItemPromotion struct {
 }
 
 type ItemTransaction struct {
-	ID  string `json:"id"`
-	Qty int    `json:"qty"`
+	Item *Item `json:"item"`
+	Qty  int   `json:"qty"`
 }
 
 type Manager struct {
@@ -71,21 +71,34 @@ type NewItem struct {
 	Aisle          string   `json:"aisle"`
 }
 
+type NewItemTransaction struct {
+	ID  string `json:"id"`
+	Qty int    `json:"qty"`
+}
+
 type NewManager struct {
 	FirstName    string `json:"firstName"`
 	LastName     string `json:"lastName"`
 	DepartmentID string `json:"departmentId"`
 }
 
+type NewTransaction struct {
+	Type          string                `json:"type"`
+	PaymentMethod string                `json:"paymentMethod"`
+	Items         []*NewItemTransaction `json:"items"`
+}
+
 type Query struct {
 }
 
 type Transaction struct {
-	ID        string             `json:"id"`
-	Items     []*ItemTransaction `json:"items"`
-	QtyItems  int                `json:"qtyItems"`
-	TotalCost float64            `json:"totalCost"`
-	Time      string             `json:"time"`
+	ID            string             `json:"id"`
+	PaymentMethod string             `json:"paymentMethod"`
+	Items         []*ItemTransaction `json:"items"`
+	QtyItems      int                `json:"qtyItems"`
+	TotalCost     float64            `json:"totalCost"`
+	Time          string             `json:"time"`
+	Status        string             `json:"status"`
 }
 
 type UpdateDepartment struct {

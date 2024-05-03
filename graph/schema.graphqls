@@ -39,16 +39,20 @@ type Item {
 
 
 type ItemTransaction {
-	id: ID!
+	item: Item!
 	qty: Int!
 }
 
 type Transaction {
 	id: ID!
+	paymentMethod: String!
 	items: [ItemTransaction]!
 	qtyItems: Int!
 	totalCost: Float!
-	time: String!
+	savings: Float!
+	status: String!
+	createdAt: String!
+	updatedAt: String!
 }
 
 input NewItem {
@@ -111,6 +115,17 @@ input UpdateManager {
 	departmentId: ID!
 }
 
+input NewItemTransaction {
+	id: ID!
+	qty: Int!
+}
+
+input NewTransaction {
+	type: String!
+	paymentMethod: String!
+	items: [NewItemTransaction]!
+}
+
 type Query {
 	getAllItems: [Item]
 	getItemById(id: ID): Item
@@ -127,8 +142,8 @@ type Mutation {
 	addItem(input: NewItem): Item
 	updateItem(input: UpdateItem): Item
 	deleteItem(id: ID): ID
-	# sellItem(input: ItemTransaction): Item
-	# returnItem(input: ItemTransaction): Item
+	sellTransaction(input: NewTransaction): Transaction
+	returnTransaction(input: NewTransaction): Transaction
 	orderItems(input: ItemOrder): Item
 	startSaleItem(input: ItemPromotion): Item
 	endSaleItem(input: ID): ID
