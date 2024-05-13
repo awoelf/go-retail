@@ -2,27 +2,28 @@
 ![GitHub last commit](https://img.shields.io/github/last-commit/awoelf/go-retail)
 # GoRetail
 ## About
-GoRetail is a Postgres back end written in Go to help users manage their retail store data with departments, aisles, managers, and items.
+GoRetail is a Postgres back end written in Go to help users manage their retail store data with departments, aisles, managers, items, and transactions.
 
 ### Built With
 - [Go](https://go.dev/)
 - [Docker Postgres](https://hub.docker.com/_/postgres/)
 - [GraphQL](https://graphql.org/)
 - [gqlgen](https://github.com/99designs/gqlgen)
+- [Gin](https://gin-gonic.com/)
 - [Postgres Driver for Go](https://github.com/jackc/pgx/)
 
 ## Features
-- CRUD functionality for all models
+- Models
 	- Department
 	- Manager
 	- Item
+	- Transaction
 - sqlx migrations
 - GraphQL playground
 
 ### Planned Features
-- User log in
-- Store, User, Transaction, and Employee Models
-- Client App
+- Testing suite
+- Terminal input and output
 
 ## Contact
 Alexis Woelffer

@@ -6,7 +6,6 @@ package graph
 
 import (
 	"context"
-	"fmt"
 	"log"
 
 	"github.com/awoelf/go-retail/graph/model"
@@ -67,12 +66,24 @@ func (r *mutationResolver) DeleteItem(ctx context.Context, id *string) (*string,
 
 // SellTransaction is the resolver for the sellTransaction field.
 func (r *mutationResolver) SellTransaction(ctx context.Context, input *model.NewTransaction) (*model.Transaction, error) {
-	panic(fmt.Errorf("not implemented: SellTransaction - sellTransaction"))
+	res, err := r.Services.Transaction.SellTransaction(ctx, input)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return res, nil
 }
 
 // ReturnTransaction is the resolver for the returnTransaction field.
 func (r *mutationResolver) ReturnTransaction(ctx context.Context, input *model.NewTransaction) (*model.Transaction, error) {
-	panic(fmt.Errorf("not implemented: ReturnTransaction - returnTransaction"))
+	res, err := r.Services.Transaction.ReturnTransaction(ctx, input)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return res, nil
 }
 
 // OrderItems is the resolver for the orderItems field.
