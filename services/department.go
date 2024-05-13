@@ -17,9 +17,9 @@ func (d *Department) AddDepartment(ctx context.Context, input *model.NewDepartme
 	
 	query := `
 		INSERT INTO departments(
-			Name
-			CreatedAt
-			UpdatedAt
+			name
+			createdAt
+			updatedAt
 		) 
 		VALUES($1, $2, $2)
 	`
@@ -36,7 +36,7 @@ func (d *Department) GetAllDepartments(ctx context.Context) ([]*model.Department
 	ctx, cancel := context.WithTimeout(ctx, Timeout)
 	defer cancel()
 	
-	query := `SELECT * FROM departments ORDER BY ID`
+	query := `SELECT * FROM departments`
 
 	rows, err := db.QueryContext(ctx, query)
 	if err != nil {
@@ -66,7 +66,7 @@ func (d *Department) GetDepartmentById(ctx context.Context, id *string) (*model.
 	ctx, cancel := context.WithTimeout(ctx, Timeout)
 	defer cancel()
 	
-	query := `SELECT * FROM departments WHERE ID = $1`
+	query := `SELECT * FROM departments WHERE id = $1`
 
 	row, err := db.QueryContext(ctx, query, id)
 	if err != nil {
@@ -95,9 +95,9 @@ func (d *Department) UpdateDepartment(ctx context.Context, input *model.UpdateDe
 	query := `
 		UPDATE departments 
 		SET 
-			Name = $1, 
-			UpdatedAt = $2 
-		WHERE ID = $3
+			name = $1, 
+			updatedAt = $2 
+		WHERE id = $3
 	`
 
 	_, err := db.ExecContext(ctx, query, input.Name, time.Now(), input.ID)
@@ -112,7 +112,7 @@ func (d *Department) DeleteDepartment(ctx context.Context, id *string) (error) {
 	ctx, cancel := context.WithTimeout(ctx, Timeout)
 	defer cancel()
 	
-	query := `DELETE FROM departments WHERE ID = $1`
+	query := `DELETE FROM departments WHERE id = $1`
 
 	_, err := db.ExecContext(ctx, query, id)
 	if err != nil {
@@ -126,7 +126,7 @@ func (d *Department) GetTopDepartments(ctx context.Context) ([]*model.Department
 	ctx, cancel := context.WithTimeout(ctx, Timeout)
 	defer cancel()
 	
-	query := `SELECT * FROM departments ORDER BY TotalSalesDept DESC`
+	query := `SELECT * FROM departments ORDER BY totalSalesDept DESC`
 
 	rows, err := db.QueryContext(ctx, query)
 	if err != nil {

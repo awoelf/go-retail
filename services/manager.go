@@ -15,11 +15,11 @@ func (m *Manager) AddManager(ctx context.Context, input *model.NewManager) (*mod
 	
 	query := `
 		INSERT INTO managers(
-			FirstName, 
-			LastName, 
-			DepartmentID,
-			CreatedAt,
-			UpdatedAt
+			firstName, 
+			lastName, 
+			departmentID,
+			createdAt,
+			updatedAt
 		) 
 		VALUES($1,$2,$3,$4,$4)
 	`
@@ -67,7 +67,7 @@ func (m *Manager) GetManagerById(ctx context.Context, id *string) (*model.Manage
 	ctx, cancel := context.WithTimeout(ctx, Timeout)
 	defer cancel()
 	
-	query := `SELECT * FROM managers WHERE ID = $1`
+	query := `SELECT * FROM managers WHERE id = $1`
 
 	row, err := db.QueryContext(ctx, query, id)
 	if err != nil {
@@ -97,11 +97,11 @@ func (m *Manager) UpdateManager(ctx context.Context, input *model.UpdateManager)
 	query := `
 		UPDATE managers 
 		SET 
-			FirstName = $1, 
-			LastName = $2, 
-			DepartmentID = $3, 
-			UpdatedAt = $4 
-		WHERE ID = $5
+			firstName = $1, 
+			lastName = $2, 
+			departmentID = $3, 
+			updatedAt = $4 
+		WHERE id = $5
 	`
 
 	_, err := db.ExecContext(
@@ -124,7 +124,7 @@ func (m *Manager) DeleteManager(ctx context.Context, id *string) (error) {
 	ctx, cancel := context.WithTimeout(ctx, Timeout)
 	defer cancel()
 	
-	query := `DELETE FROM managers WHERE ID = $1`
+	query := `DELETE FROM managers WHERE id = $1`
 
 	_, err := db.ExecContext(ctx, query, id)
 	if err != nil {

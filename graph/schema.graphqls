@@ -37,16 +37,10 @@ type Item {
 	updatedAt: String
 }
 
-
-type ItemTransaction {
-	item: Item!
-	qty: Int!
-}
-
 type Transaction {
 	id: ID!
 	paymentMethod: String!
-	items: [ItemTransaction]!
+	items: [ID]!
 	qtyItems: Int!
 	totalCost: Float!
 	savings: Float!
@@ -115,15 +109,10 @@ input UpdateManager {
 	departmentId: ID!
 }
 
-input NewItemTransaction {
-	id: ID!
-	qty: Int!
-}
-
 input NewTransaction {
 	type: String!
 	paymentMethod: String!
-	items: [NewItemTransaction]!
+	items: [ID]!
 }
 
 type Query {

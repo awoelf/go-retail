@@ -2,24 +2,35 @@ package services
 
 import (
 	"context"
+	"time"
 
 	"github.com/awoelf/go-retail/graph/model"
 )
 
 type Transaction struct{}
 
-func (t *Transaction) SellTransaction(ctx context.Context, input *model.ItemTransaction) (*model.Transaction, error) {
+func (t *Transaction) SellTransaction(ctx context.Context, input *model.NewTransaction) (*model.Transaction, error) {
 	ctx, cancel := context.WithTimeout(ctx, Timeout)
 	defer cancel()
 
 	query := `
 		INSERT INTO transactions(
-		
+			type,
+			paymentMethod,
+			items,
+			qtyItems,
+			totalCost,
+			savings,
+			status,
+			createdAt,
+			updatedAt
 		)
-
+		VALUES($1, $2, $3, $4, $5, $6, $7, $8, $8)
 	`
 
-	_, err := db.ExecContext(ctx, query, input.QtyTransaction, time.Now(), input.ID)
+	
+
+	_, err := db.ExecContext(ctx, query, input.Type, input.PaymentMethod, input.Items, time.Now())
 	if err != nil {
 		return nil, err
 	}
@@ -47,12 +58,3 @@ func (t *Transaction) SellTransaction(ctx context.Context, input *model.ItemTran
 
 // 	return input, nil
 // }
-
-// Equates to scanning an item during transaction in person or adding item to cart online
-func (t *Transaction) AddItemTransaction() {
-
-}
-
-func (t *Transaction) RemoveItemTransaction() {
-
-}

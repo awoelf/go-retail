@@ -16,14 +16,14 @@ func (i *Item) AddItem(ctx context.Context, input *model.NewItem) (*model.NewIte
 
 	query := `
 		INSERT INTO items(
-			DepartmentID, 
-			Name, 
-			Price, 
-			Qty, 
-			Category, 
-			Aisle, 
-			CreatedAt, 
-			UpdatedAt
+			departmentID, 
+			name, 
+			price, 
+			qty, 
+			category, 
+			aisle, 
+			createdAt, 
+			updatedAt
 		) 
 		VALUES($1,$2,$3,$4,$5,$6,$7,$7)
 	`
@@ -50,7 +50,7 @@ func (i *Item) GetAllItems(ctx context.Context) ([]*model.Item, error) {
 	ctx, cancel := context.WithTimeout(ctx, Timeout)
 	defer cancel()
 
-	query := `SELECT * FROM items ORDER BY ID`
+	query := `SELECT * FROM items ORDER BY id`
 
 	rows, err := db.QueryContext(ctx, query)
 	if err != nil {
@@ -88,7 +88,7 @@ func (i *Item) GetItemById(ctx context.Context, id *string) (*model.Item, error)
 	ctx, cancel := context.WithTimeout(ctx, Timeout)
 	defer cancel()
 
-	query := `SELECT * FROM items WHERE ID = $1`
+	query := `SELECT * FROM items WHERE id = $1`
 
 	row := db.QueryRowContext(ctx, query, id)
 
@@ -122,18 +122,18 @@ func (i *Item) UpdateItem(ctx context.Context, input *model.UpdateItem) (*model.
 	query := `
 		UPDATE items 
 		SET 
-			Name = $1,
-			DepartmentID = $2,
-			Price = $3, 
-			Qty = $4, 
-			QtySold = $5
-			Category = $6, 
-			Promo = $7,
-			PromoPrice = $8
-			TotalSalesItem = $9, 
-			Aisle = $10,
-			UpdatedAt = $11 
-		WHERE ID = $12
+			name = $1,
+			departmentID = $2,
+			price = $3, 
+			qty = $4, 
+			qtySold = $5
+			category = $6, 
+			promo = $7,
+			promoPrice = $8
+			totalSalesItem = $9, 
+			aisle = $10,
+			updatedAt = $11 
+		WHERE id = $12
 	`
 
 	_, err := db.ExecContext(
@@ -163,7 +163,7 @@ func (i *Item) DeleteItem(ctx context.Context, id *string) error {
 	ctx, cancel := context.WithTimeout(ctx, Timeout)
 	defer cancel()
 
-	query := `DELETE FROM items WHERE ID = ?`
+	query := `DELETE FROM items WHERE id = ?`
 
 	_, err := db.ExecContext(ctx, query, id)
 	if err != nil {
@@ -177,7 +177,7 @@ func (i *Item) OrderItems(ctx context.Context, input *model.ItemOrder) (*model.I
 	ctx, cancel := context.WithTimeout(ctx, Timeout)
 	defer cancel()
 
-	query := `UPDATE items SET Qty = (Qty + $1), UpdatedAt = $2 WHERE ID = $3`
+	query := `UPDATE items SET qty = (qty + $1), updatedAt = $2 WHERE id = $3`
 
 	_, err := db.ExecContext(ctx, query, input.QtyOrder, time.Now(), input.ID)
 	if err != nil {
@@ -191,7 +191,7 @@ func (i *Item) GetTopItems(ctx context.Context) ([]*model.Item, error) {
 	ctx, cancel := context.WithTimeout(ctx, Timeout)
 	defer cancel()
 
-	query := `SELECT * FROM items ORDER BY QtySold DESC`
+	query := `SELECT * FROM items ORDER BY qtySold DESC`
 
 	rows, err := db.QueryContext(ctx, query)
 	if err != nil {
@@ -229,7 +229,7 @@ func (i *Item) GetItemsByCategory(ctx context.Context, category *string) ([]*mod
 	ctx, cancel := context.WithTimeout(ctx, Timeout)
 	defer cancel()
 
-	query := `SELECT * FROM items WHERE Category = $1`
+	query := `SELECT * FROM items WHERE category = $1`
 
 	rows, err := db.QueryContext(ctx, query, category)
 	if err != nil {
@@ -267,7 +267,7 @@ func (i *Item) StartSaleItem(ctx context.Context, input *model.ItemPromotion) (*
 	ctx, cancel := context.WithTimeout(ctx, Timeout)
 	defer cancel()
 
-	query := `UPDATE items SET Promo = $1, PromoPrice = $2 WHERE ID = $3`
+	query := `UPDATE items SET promo = $1, promoPrice = $2 WHERE id = $3`
 
 	_, err := db.ExecContext(ctx, query, input.Promo, input.PromoPrice, input.ID)
 	if err != nil {
@@ -281,7 +281,7 @@ func (i *Item) EndSaleItem(ctx context.Context, id *string) (*string, error) {
 	ctx, cancel := context.WithTimeout(ctx, Timeout)
 	defer cancel()
 
-	query := `UPDATE items SET Promotion = false WHERE ID = $1`
+	query := `UPDATE items SET promo = false WHERE id = $1`
 
 	_, err := db.ExecContext(ctx, query, id)
 	if err != nil {
