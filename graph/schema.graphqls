@@ -39,12 +39,12 @@ type Item {
 
 type Transaction {
 	id: ID!
+	type: String!
 	paymentMethod: String!
 	items: [ID]!
 	qtyItems: Int!
 	totalCost: Float!
 	savings: Float!
-	status: String!
 	createdAt: String!
 	updatedAt: String!
 }
